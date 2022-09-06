@@ -37,7 +37,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WhatsApp2(){
     val navController = rememberNavController()
-
     Scaffold() {
         NavHost(navController = navController, startDestination = "login"){
             composable(route = "login"){
@@ -47,7 +46,8 @@ fun WhatsApp2(){
             }
             composable(route = "home"){
                 HomeScreen(
-                    navController
+                    navController,
+                    mutableListOf()
                 )
             }
         }
