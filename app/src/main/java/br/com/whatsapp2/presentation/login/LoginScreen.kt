@@ -84,7 +84,7 @@ fun LoginScreen(
             ){
                 Text(
                     text = "Login",
-                    style = MaterialTheme.typography.body2
+                    style = MaterialTheme.typography.body1
                         .copy(color = Color.Black, fontWeight = FontWeight.Bold)
                 )
             }

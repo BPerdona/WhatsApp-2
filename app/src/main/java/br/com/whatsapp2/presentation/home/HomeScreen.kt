@@ -6,13 +6,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.whatsapp2.domain.model.Chat
@@ -33,28 +37,31 @@ fun HomeScreen(
         )
     )
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .background(Color.LightGray),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TopAppBar(
+        Card(
             modifier = Modifier
+                .padding(bottom = 4.dp)
                 .fillMaxWidth()
-                .padding(bottom = 4.dp),
-            backgroundColor = Color.Green,
+                .shadow(10.dp),
+            backgroundColor = Color(0xFFa5cfaa),
         ) {
             Text(
-                text = "WhatsApp2: Chat",
+                modifier = Modifier.padding(10.dp),
+                textAlign = TextAlign.Center,
+                text = "WhatsApp2",
                 color = Color.Black,
                 style = MaterialTheme.typography.h5.copy(
                     Color.Black, fontWeight = FontWeight.Bold
                 )
             )
         }
-        Menu(nav)
-        HomeList(nav = nav, chats = chats)
+    Menu(nav)
+    HomeList(nav = nav, chats = chats)
     }
 }
 
@@ -128,7 +135,7 @@ fun Menu(nav: NavController){
             .padding(6.dp)
             .size(60.dp)
             .clickable {
-                nav.navigate("login") //TODO
+                nav.navigate("newchat/aaa") //TODO
             },
         backgroundColor = Color.White
     ) {
@@ -145,10 +152,12 @@ fun Menu(nav: NavController){
                 ),
             )
             Icon(
-                modifier = Modifier.padding(end = 12.dp).size(32.dp),
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(32.dp),
                 imageVector = Icons.Default.Add,
                 contentDescription = "Start new chat",
-                tint = Color.LightGray
+                tint = Color(0xFFa5cfaa)
             )
         }
     }
@@ -158,7 +167,7 @@ fun Menu(nav: NavController){
             .padding(6.dp)
             .size(60.dp)
             .clickable {
-                nav.navigate("login") //TODO
+                nav.navigate("newgroup/aaa") //TODO
             },
         backgroundColor = Color.White
     ) {
@@ -175,10 +184,12 @@ fun Menu(nav: NavController){
                 ),
             )
             Icon(
-                modifier = Modifier.padding(end = 12.dp).size(32.dp),
+                modifier = Modifier
+                    .padding(end = 12.dp)
+                    .size(32.dp),
                 imageVector = Icons.Default.Add,
                 contentDescription = "Start new chat",
-                tint = Color.LightGray
+                tint = Color(0xFFa5cfaa)
             )
         }
     }

@@ -9,11 +9,15 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import br.com.whatsapp2.presentation.home.HomeScreen
 import br.com.whatsapp2.presentation.login.LoginScreen
+import br.com.whatsapp2.presentation.newchat.NewChatScreen
+import br.com.whatsapp2.presentation.newgroup.NewGroupScreen
 import br.com.whatsapp2.ui.theme.WhatsApp2Theme
 
 class MainActivity : ComponentActivity() {
@@ -48,6 +52,32 @@ fun WhatsApp2(){
                 HomeScreen(
                     navController,
                     mutableListOf()
+                )
+            }
+            composable(
+                route = "newchat/{name}",
+                arguments = listOf(
+                    navArgument("name"){
+                        defaultValue=""
+                        type= NavType.StringType
+                    }
+                )
+            ){
+                NewChatScreen(
+                    navController
+                )
+            }
+            composable(
+                route = "newgroup/{name}",
+                arguments = listOf(
+                    navArgument("name"){
+                        defaultValue=""
+                        type= NavType.StringType
+                    }
+                )
+            ){
+                NewGroupScreen(
+                    navController
                 )
             }
         }
