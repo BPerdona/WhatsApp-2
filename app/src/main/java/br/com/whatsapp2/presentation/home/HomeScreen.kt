@@ -88,7 +88,7 @@ fun ChatCard(
             .padding(6.dp)
             .size(60.dp)
             .clickable {
-                nav.navigate("login") //TODO
+                nav.navigate("chat/1") //TODO
             },
         backgroundColor = Color.White,
     ) {
@@ -103,7 +103,7 @@ fun ChatCard(
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = "${chat.contact.username}",
+                    text = chat.contact.username,
                     style = MaterialTheme.typography.h6.copy(
                         Color.Black, fontWeight = FontWeight.Bold
                     ),

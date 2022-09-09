@@ -14,6 +14,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import br.com.whatsapp2.presentation.chat.ChatScreen
 import br.com.whatsapp2.presentation.home.HomeScreen
 import br.com.whatsapp2.presentation.login.LoginScreen
 import br.com.whatsapp2.presentation.newchat.NewChatScreen
@@ -79,6 +80,17 @@ fun WhatsApp2(){
                 NewGroupScreen(
                     navController
                 )
+            }
+            composable(
+                route = "chat/{id}",
+                arguments = listOf(
+                    navArgument("id"){
+                        defaultValue=0
+                        type= NavType.IntType
+                    }
+                )
+            ){
+                ChatScreen(nav = navController)
             }
         }
     }
