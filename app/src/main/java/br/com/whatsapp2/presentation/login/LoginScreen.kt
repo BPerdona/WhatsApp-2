@@ -18,7 +18,8 @@ import br.com.whatsapp2.R
 
 @Composable
 fun LoginScreen(
-    nav: NavController
+    nav: NavController,
+    viewModel: LoginViewModel
 ){
     var username by remember { mutableStateOf("")}
     var password by remember { mutableStateOf("")}
@@ -27,14 +28,22 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black),
+                .background(Color.LightGray),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.size(200.dp))
+            Spacer(modifier = Modifier.size(30.dp))
             Text(
                 text = "Bem vindo ao WhatsApp 2",
                 style = MaterialTheme.typography.h5.copy(
-                    color = Color.Green,
+                    color = Color.DarkGray,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+            Spacer(modifier = Modifier.size(150.dp))
+            Text(
+                text = "Login:",
+                style = MaterialTheme.typography.h5.copy(
+                    color = Color.DarkGray,
                     fontWeight = FontWeight.Bold
                 )
             )
@@ -42,51 +51,82 @@ fun LoginScreen(
             OutlinedTextField(
                 value = username,
                 onValueChange = {username=it},
+                singleLine = true,
                 label = { Text(text = "Username")},
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedLabelColor = Color.Green,
-                    focusedIndicatorColor = Color.Green
+                    focusedLabelColor = Color.DarkGray,
+                    focusedIndicatorColor = Color.DarkGray,
+                    unfocusedIndicatorColor = Color.DarkGray,
+                    unfocusedLabelColor = Color.DarkGray,
+                    backgroundColor = Color.White,
+                    textColor = Color.Black
                 )
             )
             Spacer(modifier = Modifier.size(5.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = {password=it},
+                singleLine = true,
                 label = { Text(text = "Password")},
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedLabelColor = Color.Green,
-                    focusedIndicatorColor = Color.Green
+                    focusedLabelColor = Color.DarkGray,
+                    focusedIndicatorColor = Color.DarkGray,
+                    unfocusedIndicatorColor = Color.DarkGray,
+                    unfocusedLabelColor = Color.DarkGray,
+                    backgroundColor = Color.White,
+                    textColor = Color.Black
                 ),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     val image = if(passwordVisible)
-                        painterResource(id = R.drawable.visibility_on)
-                    else
                         painterResource(id = R.drawable.visible_off)
+                    else
+                        painterResource(id = R.drawable.visibility_on)
                     IconButton(onClick = {passwordVisible = !passwordVisible}) {
                         Icon(
                             painter = image,
                             "Visibility Icon",
-                            modifier = Modifier.size(25.dp)
+                            modifier = Modifier.size(25.dp),
+                            tint = Color.DarkGray
                         )
                     }
                 }
             )
-            Spacer(modifier = Modifier.size(20.dp))
-            Button(
-                onClick = {
-                          nav.navigate("home")
-                },
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color.Green,
-                    contentColor = Color.Black
-                )
-            ){
-                Text(
-                    text = "Login",
-                    style = MaterialTheme.typography.body1
-                        .copy(color = Color.Black, fontWeight = FontWeight.Bold)
-                )
+            Spacer(modifier = Modifier.size(30.dp))
+            Row(){
+                Button(
+                    modifier = Modifier.padding(start = 5.dp, end = 30.dp),
+                    onClick = {
+                        nav.navigate("signup")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.Green,
+                        contentColor = Color.Black
+                    )
+                ){
+                    Text(
+                        text = "Sign Up",
+                        style = MaterialTheme.typography.body1
+                            .copy(color = Color.Black, fontWeight = FontWeight.Bold)
+                    )
+                }
+
+                Button(
+                    modifier = Modifier.padding(start = 30.dp, end = 5.dp),
+                    onClick = {
+                        nav.navigate("home")
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        backgroundColor = Color.Green,
+                        contentColor = Color.Black
+                    )
+                ){
+                    Text(
+                        text = "Login",
+                        style = MaterialTheme.typography.body1
+                            .copy(color = Color.Black, fontWeight = FontWeight.Bold)
+                    )
+                }
             }
         }
     }

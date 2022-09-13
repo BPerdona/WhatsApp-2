@@ -1,4 +1,11 @@
 package br.com.whatsapp2
 
-class WhatsAppApplication {
+import android.app.Application
+import br.com.whatsapp2.data.local.WhatsAppDatabase
+
+class WhatsAppApplication(): Application() {
+
+    val whatsAppDatabase: WhatsAppDatabase by lazy {
+        WhatsAppDatabase.getInstance(this)
+    }
 }

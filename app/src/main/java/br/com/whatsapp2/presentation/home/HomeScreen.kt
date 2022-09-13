@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -16,26 +15,15 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import br.com.whatsapp2.domain.model.Chat
-import br.com.whatsapp2.domain.model.User
+import br.com.whatsapp2.data.local.entity.Chat
 
 @Composable
 fun HomeScreen(
     nav: NavController,
     chats: MutableList<Chat>
 ){
-    chats.add(
-        Chat(
-            id=1,
-            messages = listOf(),
-            user = User(1,"Bruno"),
-            contact = User(1, "Acacio"),
-            lastMessage = "12:02"
-        )
-    )
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -103,7 +91,7 @@ fun ChatCard(
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = chat.contact.username,
+                    text = chat.contact,
                     style = MaterialTheme.typography.h6.copy(
                         Color.Black, fontWeight = FontWeight.Bold
                     ),
@@ -116,7 +104,7 @@ fun ChatCard(
             ) {
                 Text(
                     modifier = Modifier.padding(end = 12.dp),
-                    text = "${chat.lastMessage}",
+                    text = "$chat",
                     style = MaterialTheme.typography.subtitle2.copy(
                         Color.LightGray, fontWeight = FontWeight.Bold
                     ),

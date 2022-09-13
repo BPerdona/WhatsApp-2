@@ -1,4 +1,4 @@
-package br.com.whatsapp2.presentation.signup
+package br.com.whatsapp2.presentation.login.signup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,14 +17,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.whatsapp2.R
+import br.com.whatsapp2.presentation.login.LoginViewModel
 
 @Composable
 fun SignUpScreen(
-    nav: NavController
+    nav: NavController,
+    viewModel: LoginViewModel
 ){
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(true) }
+    var signError by remember { mutableStateOf(true) }
+
     Scaffold() {
         Column(
             modifier = Modifier
@@ -49,6 +53,15 @@ fun SignUpScreen(
                 )
             )
             Spacer(modifier = Modifier.size(30.dp))
+            if(!signError)
+                Text(
+                    text = "Error! Try Again.",
+                    style = MaterialTheme.typography.body2.copy(
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            Spacer(modifier = Modifier.size(10.dp))
             OutlinedTextField(
                 value = username,
                 onValueChange = {username=it},
@@ -95,7 +108,13 @@ fun SignUpScreen(
             )
             Spacer(modifier = Modifier.size(30.dp))
             Button(
-                onClick = { },
+                enabled = username.isNotBlank() && password.isNotBlank(),
+                onClick = {
+                    signError = viewModel.signUpUser(username, password)
+                    if(signError)
+                        nav.navigate("login")
+
+                },
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color.Green,
                     contentColor = Color.Black

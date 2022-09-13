@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -13,36 +12,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.semantics.SemanticsProperties.ImeAction
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import br.com.whatsapp2.domain.model.Chat
-import br.com.whatsapp2.domain.model.Message
-import br.com.whatsapp2.domain.model.User
-import br.com.whatsapp2.presentation.home.HomeList
-import br.com.whatsapp2.presentation.home.Menu
+import br.com.whatsapp2.data.local.entity.Chat
+import br.com.whatsapp2.data.local.entity.Message
 
 @Composable
 fun ChatScreen(
     nav: NavController,
-    chat: Chat = Chat(
-        1,
-        mutableListOf(),
-        User(1,"Bruno"),
-        User(2, "Acacio"),
-        lastMessage = "12:02"
-    )
+    chat: Chat = Chat(1, "", 1)
 ) {
     var message by remember{
         mutableStateOf("")
     }
-    var currentMessages by remember {
-        mutableStateOf(mutableListOf(Message("a", "12:02", "Acacio")))
-    }
-
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -61,7 +45,7 @@ fun ChatScreen(
             Text(
                 modifier = Modifier.padding(10.dp),
                 textAlign = TextAlign.Center,
-                text = chat.contact.username,
+                text = chat.contact,
                 color = Color.Black,
                 style = MaterialTheme.typography.h5.copy(
                     Color.Black, fontWeight = FontWeight.Bold
