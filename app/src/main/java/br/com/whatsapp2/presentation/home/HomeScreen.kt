@@ -9,6 +9,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -18,12 +19,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.whatsapp2.data.local.entity.Chat
+import br.com.whatsapp2.data.local.entity.ChatWithMessage
 
 @Composable
 fun HomeScreen(
     nav: NavController,
-    chats: MutableList<Chat>
+    viewModel: HomeViewModel
 ){
+    val chats = viewModel.chats.observeAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -49,18 +52,22 @@ fun HomeScreen(
             )
         }
     Menu(nav)
-    HomeList(nav = nav, chats = chats)
+    HomeList(nav = nav, chats = chats.value ?: listOf())
     }
 }
 
 @Composable
 fun HomeList(
     nav: NavController,
-    chats: MutableList<Chat>
+    chats: List<ChatWithMessage>
 ){
     LazyColumn(){
         items(chats){ chat ->
-            ChatCard(chat = chat, nav = nav)
+            ChatCard(
+                chat = chat.Chat,
+                lastMessage = if (chat.messages.isEmpty()) "Comece a conversa!" else chat.messages.last().text,
+                nav = nav
+            )
         }
     }
 }
@@ -68,6 +75,7 @@ fun HomeList(
 @Composable
 fun ChatCard(
     chat: Chat,
+    lastMessage: String,
     nav: NavController
 ){
     Card(
@@ -76,7 +84,7 @@ fun ChatCard(
             .padding(6.dp)
             .size(60.dp)
             .clickable {
-                nav.navigate("chat/1") //TODO
+                nav.navigate("chat/${chat.pk}") //TODO
             },
         backgroundColor = Color.White,
     ) {
@@ -104,7 +112,7 @@ fun ChatCard(
             ) {
                 Text(
                     modifier = Modifier.padding(end = 12.dp),
-                    text = "$chat",
+                    text = lastMessage,
                     style = MaterialTheme.typography.subtitle2.copy(
                         Color.LightGray, fontWeight = FontWeight.Bold
                     ),
@@ -123,7 +131,7 @@ fun Menu(nav: NavController){
             .padding(6.dp)
             .size(60.dp)
             .clickable {
-                nav.navigate("newchat/aaa") //TODO
+                nav.navigate("newchat") //TODO
             },
         backgroundColor = Color.White
     ) {
@@ -155,7 +163,7 @@ fun Menu(nav: NavController){
             .padding(6.dp)
             .size(60.dp)
             .clickable {
-                nav.navigate("newgroup/aaa") //TODO
+                nav.navigate("newgroup") //TODO
             },
         backgroundColor = Color.White
     ) {

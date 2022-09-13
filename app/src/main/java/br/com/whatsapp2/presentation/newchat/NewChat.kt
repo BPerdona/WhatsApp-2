@@ -15,7 +15,8 @@ import androidx.navigation.NavController
 
 @Composable
 fun NewChatScreen(
-    nav: NavController
+    nav: NavController,
+    viewModel: NewChatViewModel
 ){
     var value by remember{ mutableStateOf("")}
     Column(
@@ -66,8 +67,10 @@ fun NewChatScreen(
         )
         Spacer(modifier = Modifier.size(30.dp))
         Button(
+            enabled = value.isNotBlank(),
             onClick = {
-                nav.navigate("home") //TODO
+                viewModel.createChat(value)
+                nav.navigate("home")
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color.Green,

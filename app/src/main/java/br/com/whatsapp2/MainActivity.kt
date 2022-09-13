@@ -9,7 +9,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,12 +20,16 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import br.com.whatsapp2.presentation.chat.ChatScreen
 import br.com.whatsapp2.presentation.home.HomeScreen
+import br.com.whatsapp2.presentation.home.HomeVMFactory
+import br.com.whatsapp2.presentation.home.HomeViewModel
 import br.com.whatsapp2.presentation.login.LoginScreen
 import br.com.whatsapp2.presentation.login.LoginVMFactory
 import br.com.whatsapp2.presentation.login.LoginViewModel
 import br.com.whatsapp2.presentation.newchat.NewChatScreen
 import br.com.whatsapp2.presentation.newgroup.NewGroupScreen
 import br.com.whatsapp2.presentation.login.signup.SignUpScreen
+import br.com.whatsapp2.presentation.newchat.NewChatVMFactory
+import br.com.whatsapp2.presentation.newchat.NewChatViewModel
 import br.com.whatsapp2.ui.theme.WhatsApp2Theme
 
 class MainActivity : ComponentActivity() {
@@ -36,6 +42,18 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        val homeViewModel: HomeViewModel by viewModels{
+            HomeVMFactory(
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao()
+            )
+        }
+
+        val newChatViewModel: NewChatViewModel by viewModels{
+            NewChatVMFactory(
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao()
+            )
+        }
+
         setContent {
             WhatsApp2Theme {
                 // A surface container using the 'background' color from the theme
@@ -44,7 +62,9 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colors.background
                 ) {
                     WhatsApp2(
-                        loginViewModel
+                        loginViewModel,
+                        homeViewModel,
+                        newChatViewModel
                     )
                 }
             }
@@ -55,7 +75,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WhatsApp2(
-    loginViewModel: LoginViewModel
+    loginViewModel: LoginViewModel,
+    homeViewModel: HomeViewModel,
+    newChatViewModel: NewChatViewModel
 ){
     val navController = rememberNavController()
     Scaffold() {
@@ -73,26 +95,22 @@ fun WhatsApp2(
                 )
             }
             composable(route = "home"){
+                homeViewModel.getChats(loginViewModel.loggedUser.pk)
                 HomeScreen(
                     navController,
-                    mutableListOf()
+                    homeViewModel
                 )
             }
-            composable(
-                route = "newchat/{name}",
-                arguments = listOf(
-                    navArgument("name"){
-                        defaultValue=""
-                        type= NavType.StringType
-                    }
-                )
-            ){
+            composable(route = "newchat"){
+                newChatViewModel.setUserConst(homeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
+                newChatViewModel.chatList = homeViewModel.chats.value?.map { it.Chat.contact } ?: listOf()
                 NewChatScreen(
-                    navController
+                    navController,
+                    newChatViewModel
                 )
             }
             composable(
-                route = "newgroup/{name}",
+                route = "newgroup",
                 arguments = listOf(
                     navArgument("name"){
                         defaultValue=""

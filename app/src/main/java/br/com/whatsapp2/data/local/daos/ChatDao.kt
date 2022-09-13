@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import br.com.whatsapp2.data.local.entity.Chat
 import br.com.whatsapp2.data.local.entity.ChatWithMessage
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatDao {
@@ -14,6 +15,6 @@ interface ChatDao {
     suspend fun saveChat(chat:Chat)
 
     @Query("SELECT * FROM chat WHERE userPk=:userPk")
-    suspend fun getUserChat(userPk: Int): List<ChatWithMessage>
+    fun getUserChat(userPk: Int): Flow<List<ChatWithMessage>>
 
 }

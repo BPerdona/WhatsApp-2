@@ -24,6 +24,8 @@ fun LoginScreen(
     var username by remember { mutableStateOf("")}
     var password by remember { mutableStateOf("")}
     var passwordVisible by remember { mutableStateOf(false)}
+    var loginError by remember { mutableStateOf(false) }
+
     Scaffold() {
         Column(
             modifier = Modifier
@@ -48,6 +50,15 @@ fun LoginScreen(
                 )
             )
             Spacer(modifier = Modifier.size(30.dp))
+            if(loginError)
+                Text(
+                    text = "Error! Try Again.",
+                    style = MaterialTheme.typography.body2.copy(
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            Spacer(modifier = Modifier.size(10.dp))
             OutlinedTextField(
                 value = username,
                 onValueChange = {username=it},
@@ -114,7 +125,12 @@ fun LoginScreen(
                 Button(
                     modifier = Modifier.padding(start = 30.dp, end = 5.dp),
                     onClick = {
-                        nav.navigate("home")
+                        if (viewModel.logIn(username, password)){
+                            nav.popBackStack()
+                            nav.navigate("home")
+                        }
+                        else
+                            loginError = true
                     },
                     colors = ButtonDefaults.buttonColors(
                         backgroundColor = Color.Green,

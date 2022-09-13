@@ -111,8 +111,10 @@ fun SignUpScreen(
                 enabled = username.isNotBlank() && password.isNotBlank(),
                 onClick = {
                     signError = viewModel.signUpUser(username, password)
-                    if(signError)
+                    if(signError){
+                        nav.popBackStack()
                         nav.navigate("login")
+                    }
 
                 },
                 colors = ButtonDefaults.buttonColors(

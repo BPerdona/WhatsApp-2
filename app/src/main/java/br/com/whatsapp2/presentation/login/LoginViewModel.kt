@@ -14,6 +14,7 @@ import java.nio.charset.Charset
 
 class LoginViewModel(private val dao: UserDao): ViewModel() {
     private lateinit var users: List<User>
+    var loggedUser = User(-1, "temp", "")
 
     init {
         viewModelScope.launch {
@@ -23,14 +24,15 @@ class LoginViewModel(private val dao: UserDao): ViewModel() {
 
     fun logIn(username: String, password: String): Boolean{
         users.forEach {
-            if (it.username == username && it.password == password)
+            if (it.username == username && it.password == password){
+                loggedUser = it
                 return true
+            }
         }
         return false
     }
 
     fun signUpUser(username: String, password: String): Boolean{
-        Log.e("e", "Lista de User: ${users.size}")
         users.forEach {
             if(it.username == username)
                 return false
