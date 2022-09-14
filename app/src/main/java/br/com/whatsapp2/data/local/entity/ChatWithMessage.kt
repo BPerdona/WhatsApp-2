@@ -7,6 +7,11 @@ data class ChatWithMessage(
     @Embedded
     val Chat: Chat,
     @Relation(
+        parentColumn = "userPk",
+        entityColumn = "pk"
+    )
+    val user: User,
+    @Relation(
         parentColumn = "pk",
         entityColumn = "chatPk"
     )

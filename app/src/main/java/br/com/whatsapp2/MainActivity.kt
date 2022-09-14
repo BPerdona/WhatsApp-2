@@ -19,6 +19,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import br.com.whatsapp2.presentation.chat.ChatScreen
+import br.com.whatsapp2.presentation.chat.ChatVMFactory
+import br.com.whatsapp2.presentation.chat.ChatViewModel
 import br.com.whatsapp2.presentation.home.HomeScreen
 import br.com.whatsapp2.presentation.home.HomeVMFactory
 import br.com.whatsapp2.presentation.home.HomeViewModel
@@ -44,13 +46,21 @@ class MainActivity : ComponentActivity() {
 
         val homeViewModel: HomeViewModel by viewModels{
             HomeVMFactory(
-                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao()
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao(),
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageDao()
             )
         }
 
         val newChatViewModel: NewChatViewModel by viewModels{
             NewChatVMFactory(
                 (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao()
+            )
+        }
+
+        val chatViewModel: ChatViewModel by viewModels{
+            ChatVMFactory(
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao(),
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageDao()
             )
         }
 
@@ -64,7 +74,8 @@ class MainActivity : ComponentActivity() {
                     WhatsApp2(
                         loginViewModel,
                         homeViewModel,
-                        newChatViewModel
+                        newChatViewModel,
+                        chatViewModel
                     )
                 }
             }
@@ -77,7 +88,8 @@ class MainActivity : ComponentActivity() {
 fun WhatsApp2(
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel,
-    newChatViewModel: NewChatViewModel
+    newChatViewModel: NewChatViewModel,
+    chatViewModel: ChatViewModel
 ){
     val navController = rememberNavController()
     Scaffold() {
@@ -95,6 +107,7 @@ fun WhatsApp2(
                 )
             }
             composable(route = "home"){
+                homeViewModel.user = loginViewModel.loggedUser
                 homeViewModel.getChats(loginViewModel.loggedUser.pk)
                 HomeScreen(
                     navController,
@@ -131,7 +144,12 @@ fun WhatsApp2(
                     }
                 )
             ){
-                ChatScreen(nav = navController)
+                chatViewModel.userName = loginViewModel.loggedUser.username
+                chatViewModel.getChatMessages(it.arguments?.getInt("id")?:0)
+                ChatScreen(
+                    navController,
+                    chatViewModel
+                )
             }
         }
     }

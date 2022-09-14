@@ -17,4 +17,9 @@ interface ChatDao {
     @Query("SELECT * FROM chat WHERE userPk=:userPk")
     fun getUserChat(userPk: Int): Flow<List<ChatWithMessage>>
 
+    @Query("SELECT * FROM chat WHERE pk=:chatPk")
+    fun getChatWithMessages(chatPk: Int): Flow<ChatWithMessage>
+
+    @Query("SELECT * FROM chat")
+    fun getAllChats(): Flow<List<ChatWithMessage>>
 }

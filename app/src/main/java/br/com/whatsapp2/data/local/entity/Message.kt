@@ -19,8 +19,8 @@ import androidx.room.PrimaryKey
     ]
 )
 data class Message(
-    @PrimaryKey(autoGenerate = true)
-    val pk: Int,
+    @PrimaryKey
+    val pk: String,
     val chatPk: Int,
     val text: String,
     val sender: String

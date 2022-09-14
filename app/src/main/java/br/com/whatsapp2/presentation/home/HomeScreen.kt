@@ -26,6 +26,7 @@ fun HomeScreen(
     nav: NavController,
     viewModel: HomeViewModel
 ){
+    viewModel.startConsume()
     val chats = viewModel.chats.observeAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -111,7 +112,7 @@ fun ChatCard(
                 horizontalAlignment = Alignment.End,
             ) {
                 Text(
-                    modifier = Modifier.padding(end = 12.dp),
+                    modifier = Modifier.padding(end = 22.dp),
                     text = lastMessage,
                     style = MaterialTheme.typography.subtitle2.copy(
                         Color.LightGray, fontWeight = FontWeight.Bold

@@ -8,6 +8,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -18,16 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.whatsapp2.data.local.entity.Chat
 import br.com.whatsapp2.data.local.entity.Message
+import java.util.*
 
 @Composable
 fun ChatScreen(
     nav: NavController,
-    chat: Chat = Chat(1, "", 1)
+    viewModel: ChatViewModel
 ) {
     var message by remember{
         mutableStateOf("")
     }
-
+    
+    var chat = viewModel.chatWithMessage.observeAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -45,7 +48,7 @@ fun ChatScreen(
             Text(
                 modifier = Modifier.padding(10.dp),
                 textAlign = TextAlign.Center,
-                text = chat.contact,
+                text = chat.value?.Chat?.contact?:"",
                 color = Color.Black,
                 style = MaterialTheme.typography.h5.copy(
                     Color.Black, fontWeight = FontWeight.Bold
@@ -54,8 +57,9 @@ fun ChatScreen(
         }
         Spacer(modifier = Modifier.weight(1f))
 
-        //ChatMessages(currentMessages)
+        MessageList(chat.value?.messages?: listOf())
 
+        Spacer(modifier = Modifier.weight(1f))
         Row(
             modifier = Modifier.padding(5.dp)
         ) {
@@ -77,7 +81,10 @@ fun ChatScreen(
                 modifier = Modifier
                     .height(56.dp)
                     .padding(start = 5.dp, end = 5.dp),
-                onClick = {},
+                onClick = {
+                    viewModel.sendMessage(message, chat.value?.Chat?.contact ?: "Anon")
+                    message = ""
+                },
                 enabled = message.isNotBlank(),
                 colors = ButtonDefaults.buttonColors(
                     backgroundColor = Color(0xFFa5cfaa)
@@ -90,7 +97,6 @@ fun ChatScreen(
             }
         }
     }
-
 }
 
 @Composable
@@ -98,8 +104,7 @@ fun MessageList(
     messages: List<Message>
 ){
     LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        reverseLayout = true
+        reverseLayout = false
     ){
         items(messages){
             MessageCard(it)
@@ -111,4 +116,5 @@ fun MessageList(
 fun MessageCard(
     msg: Message
 ){
+    Text(text = msg.text, color = Color.Black)
 }
