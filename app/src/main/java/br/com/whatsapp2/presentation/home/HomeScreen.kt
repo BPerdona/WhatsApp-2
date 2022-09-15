@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.whatsapp2.data.local.entity.Chat
 import br.com.whatsapp2.data.local.entity.ChatWithMessage
+import br.com.whatsapp2.data.local.entity.Message
+import java.util.*
 
 @Composable
 fun HomeScreen(
@@ -33,22 +37,22 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(Color.LightGray),
+            .background(Color(0xFF111b21)),
     ) {
         Card(
             modifier = Modifier
                 .padding(bottom = 4.dp)
                 .fillMaxWidth()
                 .shadow(10.dp),
-            backgroundColor = Color(0xFFa5cfaa),
+            backgroundColor = Color(0xFF20302c),
         ) {
             Text(
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier.padding(15.dp),
                 textAlign = TextAlign.Center,
                 text = "WhatsApp2",
-                color = Color.Black,
+                color = Color.White,
                 style = MaterialTheme.typography.h5.copy(
-                    Color.Black, fontWeight = FontWeight.Bold
+                    Color.White, fontWeight = FontWeight.Bold
                 )
             )
         }
@@ -66,7 +70,7 @@ fun HomeList(
         items(chats){ chat ->
             ChatCard(
                 chat = chat.Chat,
-                lastMessage = if (chat.messages.isEmpty()) "Comece a conversa!" else chat.messages.last().text,
+                lastMessage = if (chat.messages.isEmpty()) "Inicie a conversa!" else chat.messages.last().text,
                 nav = nav
             )
         }
@@ -83,41 +87,52 @@ fun ChatCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(6.dp)
-            .size(60.dp)
             .clickable {
                 nav.navigate("chat/${chat.pk}") //TODO
             },
-        backgroundColor = Color.White,
+        backgroundColor = Color(0xFF303c44),
     ) {
-        Row(
-            modifier = Modifier.padding(start = 15.dp),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start,
+        Column() {
+            Row(
+                modifier = Modifier.padding(start = 6.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = chat.contact,
-                    style = MaterialTheme.typography.h6.copy(
-                        Color.Black, fontWeight = FontWeight.Bold
-                    ),
-                )
-            }
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.End,
-            ) {
-                Text(
-                    modifier = Modifier.padding(end = 22.dp),
-                    text = lastMessage,
-                    style = MaterialTheme.typography.subtitle2.copy(
-                        Color.LightGray, fontWeight = FontWeight.Bold
-                    ),
-                )
+                Box(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .padding(end = 4.dp)
+                        .size(67.dp)
+                        .clip(CircleShape)
+                        .background(Color.DarkGray),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = chat.contact[0].uppercase(),
+                        style = MaterialTheme.typography.h4
+                            .copy(color = Color.White, fontWeight = FontWeight.Normal)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 3.dp),
+                        text = chat.contact,
+                        style = MaterialTheme.typography.h5.copy(
+                            Color.White, fontWeight = FontWeight.Bold
+                        ),
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 3.dp),
+                        text = if(lastMessage.length>=35) lastMessage.substring(0,35)+"...." else lastMessage,
+                        style = MaterialTheme.typography.subtitle2.copy(
+                            Color.LightGray, fontWeight = FontWeight.Normal
+                        ),
+                    )
+                }
             }
         }
     }
@@ -134,7 +149,7 @@ fun Menu(nav: NavController){
             .clickable {
                 nav.navigate("newchat") //TODO
             },
-        backgroundColor = Color.White
+        backgroundColor = Color(0xFF303c44)
     ) {
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -145,7 +160,7 @@ fun Menu(nav: NavController){
                 modifier = Modifier.weight(1f),
                 text = "Nova conversa",
                 style = MaterialTheme.typography.h6.copy(
-                    Color.Black, fontWeight = FontWeight.Bold
+                    Color.White, fontWeight = FontWeight.Bold
                 ),
             )
             Icon(
@@ -166,7 +181,7 @@ fun Menu(nav: NavController){
             .clickable {
                 nav.navigate("newgroup") //TODO
             },
-        backgroundColor = Color.White
+        backgroundColor = Color(0xFF303c44)
     ) {
         Row(
             horizontalArrangement = Arrangement.Start,
@@ -177,7 +192,7 @@ fun Menu(nav: NavController){
                 modifier = Modifier.weight(1f),
                 text = "Entrar em um grupo",
                 style = MaterialTheme.typography.h6.copy(
-                    Color.Black, fontWeight = FontWeight.Bold
+                    Color.White, fontWeight = FontWeight.Bold
                 ),
             )
             Icon(
@@ -190,4 +205,13 @@ fun Menu(nav: NavController){
             )
         }
     }
+}
+
+
+private fun formatMessage(message: String): String{
+    var formatedMessage = ""
+    if(message.length>=35){
+        formatedMessage = message.substring(0,35)+"..."
+    }
+    return formatedMessage
 }
