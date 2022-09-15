@@ -4,6 +4,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -13,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -26,95 +29,152 @@ fun ChatScreen(
     nav: NavController,
     viewModel: ChatViewModel
 ) {
-    var message by remember{
-        mutableStateOf("")
+    Column(Modifier.fillMaxSize()) {
+        ContactLabel(viewModel)
+        MessageList(
+            viewModel = viewModel,
+            Modifier
+                .background(Color(0xFF0b141a))
+                .weight(1f),
+        )
+        MessageInput(viewModel)
     }
-    
-    var chat = viewModel.chatWithMessage.observeAsState()
+}
+
+@Composable
+fun ContactLabel(
+    viewModel: ChatViewModel
+){
+    val chat = viewModel.chatWithMessage.observeAsState()
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .background(Color.LightGray),
+        modifier = Modifier.fillMaxWidth().background(Color(0xFF202c33)),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Card(
-            modifier = Modifier
-                .padding(bottom = 4.dp)
-                .fillMaxWidth()
-                .shadow(10.dp),
-            backgroundColor = Color(0xFFa5cfaa),
-        ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            horizontalArrangement = Arrangement.Center
+        ){
             Text(
-                modifier = Modifier.padding(10.dp),
-                textAlign = TextAlign.Center,
                 text = chat.value?.Chat?.contact?:"",
-                color = Color.Black,
-                style = MaterialTheme.typography.h5.copy(
-                    Color.Black, fontWeight = FontWeight.Bold
-                )
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h6
+                    .copy(color = Color.White, fontWeight = FontWeight.Bold)
             )
         }
-        Spacer(modifier = Modifier.weight(1f))
+    }
+}
 
-        MessageList(chat.value?.messages?: listOf())
 
-        Spacer(modifier = Modifier.weight(1f))
-        Row(
-            modifier = Modifier.padding(5.dp)
+@Composable
+fun MessageList(
+    viewModel: ChatViewModel,
+    modifier: Modifier
+){
+    var chat = viewModel.chatWithMessage.observeAsState()
+    Box(
+        modifier=modifier,
+        contentAlignment = Alignment.Center,
+    ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            reverseLayout = true,
         ) {
-            TextField(
-                modifier = Modifier.weight(1f),
-                value = message,
-                onValueChange = {message=it},
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.LightGray,
-                    cursorColor = Color.DarkGray,
-                    unfocusedLabelColor = Color.DarkGray,
-                    focusedLabelColor = Color.DarkGray,
-                    textColor = Color.Black,
-                    focusedIndicatorColor = Color.DarkGray,
-                    unfocusedIndicatorColor = Color.DarkGray
-                ),
-            )
-            Button(
-                modifier = Modifier
-                    .height(56.dp)
-                    .padding(start = 5.dp, end = 5.dp),
-                onClick = {
-                    viewModel.sendMessage(message, chat.value?.Chat?.contact ?: "Anon")
-                    message = ""
-                },
-                enabled = message.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = Color(0xFFa5cfaa)
-                )
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Send Message"
-                )
+            items(chat.value?.messages?.asReversed() ?: listOf()) {
+                MessageCard(msg = it, chat.value?.Chat?.contact ?: "")
             }
         }
     }
 }
 
+
 @Composable
-fun MessageList(
-    messages: List<Message>
+fun MessageCard(
+    msg: Message,
+    contact:String
 ){
-    LazyColumn(
-        reverseLayout = false
-    ){
-        items(messages){
-            MessageCard(it)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalAlignment = when (msg.sender) {
+            contact -> {
+                Alignment.Start
+            }
+            else -> {
+                Alignment.End
+            }
+        },
+    ) {
+        Card(
+            modifier = Modifier.widthIn(max = 340.dp),
+            shape = cardShapeForm(msg.sender!=contact),
+            backgroundColor = when(msg.sender){
+                contact -> {
+                    Color(0xFF005c4b)
+                }
+                else -> {
+                    Color(0xFF202c33)
+                }
+            }
+        ) {
+            Text(
+                modifier = Modifier.padding(10.dp),
+                text = msg.text,
+                color = Color.White
+            )
         }
     }
 }
 
 @Composable
-fun MessageCard(
-    msg: Message
+fun MessageInput(
+    viewModel: ChatViewModel
 ){
-    Text(text = msg.text, color = Color.Black)
+    var chat = viewModel.chatWithMessage.observeAsState()
+    var message by remember{
+        mutableStateOf("")
+    }
+    Row(
+        modifier = Modifier.padding(5.dp)
+    ) {
+        TextField(
+            modifier = Modifier.weight(1f),
+            value = message,
+            onValueChange = {message=it},
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = Color(0xFF2a3942),
+                cursorColor = Color.White,
+                textColor = Color.White,
+                focusedIndicatorColor = Color(0xFF005c4b),
+
+            ),
+        )
+        Button(
+            modifier = Modifier
+                .height(56.dp)
+                .padding(start = 5.dp, end = 5.dp),
+            onClick = {
+                viewModel.sendMessage(message, chat.value?.Chat?.contact ?: "Anon")
+                message = ""
+            },
+            enabled = message.isNotBlank(),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = Color(0xFF005c4b)
+            )
+        ) {
+            Icon(
+                imageVector = Icons.Default.Send,
+                contentDescription = "Send Message"
+            )
+        }
+    }
+}
+
+@Composable
+fun cardShapeForm(messageMine:Boolean): Shape {
+    val roundedCorners = RoundedCornerShape(16.dp)
+    return when {
+        messageMine -> roundedCorners.copy(bottomEnd = CornerSize(0))
+        else -> roundedCorners.copy(bottomStart = CornerSize(0))
+    }
 }
