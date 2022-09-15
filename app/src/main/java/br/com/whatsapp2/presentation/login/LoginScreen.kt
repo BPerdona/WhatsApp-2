@@ -11,6 +11,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import br.com.whatsapp2.R
@@ -30,47 +31,53 @@ fun LoginScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.LightGray),
+                .background(Color(0xFF111b21)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Spacer(modifier = Modifier.size(30.dp))
+            Spacer(modifier = Modifier.size(50.dp))
             Text(
                 text = "Bem vindo ao WhatsApp 2",
                 style = MaterialTheme.typography.h5.copy(
-                    color = Color.DarkGray,
+                    color = Color.White,
                     fontWeight = FontWeight.Bold
                 )
             )
-            Spacer(modifier = Modifier.size(150.dp))
+            Spacer(modifier = Modifier.size(80.dp))
             Text(
-                text = "Login:",
+                text = "Login",
                 style = MaterialTheme.typography.h5.copy(
-                    color = Color.DarkGray,
+                    color = Color.White,
                     fontWeight = FontWeight.Bold
-                )
+                ),
             )
-            Spacer(modifier = Modifier.size(30.dp))
-            if(loginError)
-                Text(
-                    text = "Error! Try Again.",
-                    style = MaterialTheme.typography.body2.copy(
-                        color = Color.Red,
-                        fontWeight = FontWeight.Bold
-                    )
-                )
             Spacer(modifier = Modifier.size(10.dp))
+            if(loginError)
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(start = 67.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    Text(
+                        text = "Error! Try Again.",
+                        style = MaterialTheme.typography.body2.copy(
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold
+                        ),
+                        textAlign = TextAlign.Start
+                    )
+                }
             OutlinedTextField(
                 value = username,
                 onValueChange = {username=it},
                 singleLine = true,
                 label = { Text(text = "Username")},
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedLabelColor = Color.DarkGray,
-                    focusedIndicatorColor = Color.DarkGray,
-                    unfocusedIndicatorColor = Color.DarkGray,
-                    unfocusedLabelColor = Color.DarkGray,
-                    backgroundColor = Color.White,
-                    textColor = Color.Black
+                    focusedLabelColor = Color.LightGray,
+                    focusedIndicatorColor = Color(0xFF005c4b),
+                    unfocusedIndicatorColor = Color(0xFF005c4b),
+                    unfocusedLabelColor = Color.LightGray,
+                    backgroundColor = Color(0xFF2a3942),
+                    textColor = Color.White
                 )
             )
             Spacer(modifier = Modifier.size(5.dp))
@@ -80,12 +87,12 @@ fun LoginScreen(
                 singleLine = true,
                 label = { Text(text = "Password")},
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedLabelColor = Color.DarkGray,
-                    focusedIndicatorColor = Color.DarkGray,
-                    unfocusedIndicatorColor = Color.DarkGray,
-                    unfocusedLabelColor = Color.DarkGray,
-                    backgroundColor = Color.White,
-                    textColor = Color.Black
+                    focusedLabelColor = Color.LightGray,
+                    focusedIndicatorColor = Color(0xFF005c4b),
+                    unfocusedIndicatorColor = Color(0xFF005c4b),
+                    unfocusedLabelColor = Color.LightGray,
+                    backgroundColor = Color(0xFF2a3942),
+                    textColor = Color.White
                 ),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
@@ -98,7 +105,7 @@ fun LoginScreen(
                             painter = image,
                             "Visibility Icon",
                             modifier = Modifier.size(25.dp),
-                            tint = Color.DarkGray
+                            tint = Color.LightGray
                         )
                     }
                 }
@@ -111,14 +118,13 @@ fun LoginScreen(
                         nav.navigate("signup")
                     },
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.Green,
-                        contentColor = Color.Black
+                        backgroundColor = Color(0xFF005c4b)
                     )
                 ){
                     Text(
                         text = "Sign Up",
                         style = MaterialTheme.typography.body1
-                            .copy(color = Color.Black, fontWeight = FontWeight.Bold)
+                            .copy(color = Color.White, fontWeight = FontWeight.Bold)
                     )
                 }
 
@@ -133,14 +139,13 @@ fun LoginScreen(
                             loginError = true
                     },
                     colors = ButtonDefaults.buttonColors(
-                        backgroundColor = Color.Green,
-                        contentColor = Color.Black
+                        backgroundColor = Color(0xFF005c4b)
                     )
                 ){
                     Text(
                         text = "Login",
                         style = MaterialTheme.typography.body1
-                            .copy(color = Color.Black, fontWeight = FontWeight.Bold)
+                            .copy(color = Color.White, fontWeight = FontWeight.Bold)
                     )
                 }
             }

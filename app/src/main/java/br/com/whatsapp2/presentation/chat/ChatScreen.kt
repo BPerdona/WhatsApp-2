@@ -1,6 +1,7 @@
 package br.com.whatsapp2.presentation.chat
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,7 +52,7 @@ fun ContactLabel(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF20302c)),
+            .background(Color(0xFF005c4b)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column() {
@@ -65,7 +66,7 @@ fun ContactLabel(
                         .padding(start = 10.dp)
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(Color.LightGray),
+                        .background(Color.DarkGray),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

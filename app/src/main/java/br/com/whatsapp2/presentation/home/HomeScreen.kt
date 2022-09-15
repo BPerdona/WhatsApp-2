@@ -44,7 +44,7 @@ fun HomeScreen(
                 .padding(bottom = 4.dp)
                 .fillMaxWidth()
                 .shadow(10.dp),
-            backgroundColor = Color(0xFF20302c),
+            backgroundColor = Color(0xFF005c4b),
         ) {
             Text(
                 modifier = Modifier.padding(15.dp),
@@ -169,7 +169,7 @@ fun Menu(nav: NavController){
                     .size(32.dp),
                 imageVector = Icons.Default.Add,
                 contentDescription = "Start new chat",
-                tint = Color(0xFFa5cfaa)
+                tint = Color(0xFF005c4b)
             )
         }
     }
@@ -201,7 +201,7 @@ fun Menu(nav: NavController){
                     .size(32.dp),
                 imageVector = Icons.Default.Add,
                 contentDescription = "Start new chat",
-                tint = Color(0xFFa5cfaa)
+                tint = Color(0xFF005c4b)
             )
         }
     }

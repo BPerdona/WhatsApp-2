@@ -23,22 +23,21 @@ fun NewGroupScreen(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .background(Color.LightGray),
+            .background(Color(0xFF111b21)),
     ) {
         Card(
             modifier = Modifier
                 .padding(bottom = 4.dp)
                 .fillMaxWidth()
                 .shadow(10.dp),
-            backgroundColor = Color(0xFFa5cfaa),
+            backgroundColor = Color(0xFF005c4b),
         ) {
             Text(
                 modifier = Modifier.padding(10.dp),
                 textAlign = TextAlign.Center,
                 text = "Novo Grupo",
-                color = Color.Black,
                 style = MaterialTheme.typography.h5.copy(
-                    Color.Black, fontWeight = FontWeight.Bold
+                    Color.White, fontWeight = FontWeight.Bold
                 )
             )
         }
@@ -50,18 +49,17 @@ fun NewGroupScreen(
                 Text(
                     text = "Nome do Grupo",
                     style = MaterialTheme.typography.body1.copy(
-                        color = Color.Black, fontWeight = FontWeight.Bold
+                        color = Color.White, fontWeight = FontWeight.Bold
                     )
                 )
             },
             colors = TextFieldDefaults.textFieldColors(
-                cursorColor = Color.DarkGray,
-                focusedIndicatorColor = Color.DarkGray,
-                focusedLabelColor = Color.DarkGray,
-                unfocusedLabelColor = Color.DarkGray,
-                unfocusedIndicatorColor = Color.DarkGray,
-                backgroundColor = Color.White,
-                textColor = Color.Black
+                focusedLabelColor = Color.LightGray,
+                focusedIndicatorColor = Color(0xFF005c4b),
+                unfocusedIndicatorColor = Color(0xFF005c4b),
+                unfocusedLabelColor = Color.LightGray,
+                backgroundColor = Color(0xFF2a3942),
+                textColor = Color.White
             )
         )
         Spacer(modifier = Modifier.size(30.dp))
@@ -70,14 +68,13 @@ fun NewGroupScreen(
                 nav.navigate("home") //TODO
             },
             colors = ButtonDefaults.buttonColors(
-                backgroundColor = Color.Green,
-                contentColor = Color.Black
+                backgroundColor = Color(0xFF005c4b),
             )
         ){
             Text(
                 text = "Entrar no grupo",
                 style = MaterialTheme.typography.body1
-                    .copy(color = Color.Black, fontWeight = FontWeight.Bold)
+                    .copy(color = Color.White, fontWeight = FontWeight.Bold)
             )
         }
     }
