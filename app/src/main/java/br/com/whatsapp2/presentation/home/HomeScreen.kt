@@ -30,7 +30,6 @@ fun HomeScreen(
     nav: NavController,
     viewModel: HomeViewModel
 ){
-    viewModel.startConsume()
     val chats = viewModel.chats.observeAsState()
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

@@ -64,6 +64,7 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        homeViewModel.startConsume()
         setContent {
             WhatsApp2Theme {
                 // A surface container using the 'background' color from the theme

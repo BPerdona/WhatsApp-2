@@ -17,6 +17,8 @@ import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 class HomeViewModel(private val dao: ChatDao, private val messageDao: MessageDao): ViewModel() {
 
@@ -38,32 +40,53 @@ class HomeViewModel(private val dao: ChatDao, private val messageDao: MessageDao
     fun startConsume(){
         val factory = ConnectionFactory()
         factory.setUri(RabbitUri)
-        val job = viewModelScope.launch{
+        viewModelScope.launch{
             consumeMessages(factory)
         }
     }
 
     private suspend fun consumeMessages(factory: ConnectionFactory){
-        withContext(Dispatchers.IO){
-            val connection = factory.newConnection()
-            val channel = connection.createChannel()
-            channel.queueDeclare(user.username, false, false, false, null)
-
-            val deliverCallback = DeliverCallback{consumerTag: String?, delivery: Delivery ->
-                val message = String(delivery.body, StandardCharsets.UTF_8).split(",")
-                addMessage(message[0], message[1])
-                Log.e("a", "$consumerTag receive a message: $message")
-            }
-
-            val cancelCallback = CancelCallback { consumerTag: String? ->
-                Log.e("a", "$consumerTag was cancelled")
-            }
-
-            channel.basicConsume(user.username, true, deliverCallback, cancelCallback)
+        while (user.pk == -1){
             delay(200L)
-            channel.close()
-            connection.close()
-            consumeMessages(factory)
+        }
+        Log.e("a", "Entrou no consume")
+        withContext(Dispatchers.IO){
+            while (true){
+                try {
+                    Log.e("a", "começou try")
+                    val connection = factory.newConnection()
+                    val channel = connection.createChannel()
+                    try{
+                        channel.queueDeclare(user.username, false, false, false, null)
+                        Log.e("a", "declarou Queue")
+                        val deliverCallback = DeliverCallback{consumerTag: String?, delivery: Delivery ->
+                            val message = String(delivery.body, StandardCharsets.UTF_8).split(",")
+                            addMessage(message[0], message[1])
+                            Log.e("a", "$consumerTag receive a message: $message")
+                        }
+
+                        val cancelCallback = CancelCallback { consumerTag: String? ->
+                            Log.e("a", "$consumerTag was cancelled")
+                        }
+
+                        Log.e("a", "Criou as variaveis")
+                        channel.basicConsume(user.username, true, deliverCallback, cancelCallback)
+                        Log.e("a", "Iniciou basic consume")
+                        delay(500L)
+                        Log.e("a", "Pós delay")
+                        channel.close()
+                        connection.close()
+                        Log.e("a", "Fechou as conexões")
+                    }catch (e: Exception){
+                        Log.e("Error", "Erro ao consumir mensagens: ${e.message}")
+                        channel.close()
+                        connection.close()
+                    }
+                }catch (e: Exception){
+                    Log.e("Error", "Erro ao conectar mensagens: ${e.message}")
+                }
+                delay(1500L)
+            }
         }
     }
 
@@ -76,9 +99,12 @@ class HomeViewModel(private val dao: ChatDao, private val messageDao: MessageDao
                     chatPk=it.Chat.pk
                 }
             }
+
             Log.e("a", "Passou ForEach com index: $chatPk")
             if(chatPk == -1){
+                Log.e("a", "Entrando no if")
                 var newIndex = getChatLastIndex()
+                Log.e("a", "Pegando valor: $newIndex")
                 dao.saveChat(
                     Chat(
                         newIndex,
@@ -89,6 +115,9 @@ class HomeViewModel(private val dao: ChatDao, private val messageDao: MessageDao
                 Log.e("a", "Salvou chat: $newIndex")
                 chatPk=newIndex
             }
+            Log.e("a", "Começou delay")
+            delay(200L)
+            Log.e("a", "Terminou delay")
             messageDao.saveMessage(
                 Message(
                     pk=UUID.randomUUID().toString(),
@@ -97,7 +126,7 @@ class HomeViewModel(private val dao: ChatDao, private val messageDao: MessageDao
                     text = text
                 )
             )
-            getChats(user.pk)
+            Log.e("a", "Salvou msg")
         }
     }
 }

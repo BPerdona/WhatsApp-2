@@ -77,7 +77,8 @@ fun LoginScreen(
                     unfocusedIndicatorColor = Color(0xFF005c4b),
                     unfocusedLabelColor = Color.LightGray,
                     backgroundColor = Color(0xFF2a3942),
-                    textColor = Color.White
+                    textColor = Color.White,
+                    cursorColor = Color(0xFF005c4b)
                 )
             )
             Spacer(modifier = Modifier.size(5.dp))
@@ -92,7 +93,8 @@ fun LoginScreen(
                     unfocusedIndicatorColor = Color(0xFF005c4b),
                     unfocusedLabelColor = Color.LightGray,
                     backgroundColor = Color(0xFF2a3942),
-                    textColor = Color.White
+                    textColor = Color.White,
+                    cursorColor = Color(0xFF005c4b)
                 ),
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {

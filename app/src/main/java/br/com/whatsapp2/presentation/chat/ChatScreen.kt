@@ -177,7 +177,6 @@ fun MessageInput(
                 cursorColor = Color.White,
                 textColor = Color.White,
                 focusedIndicatorColor = Color(0xFF005c4b),
-
             ),
         )
         Button(
