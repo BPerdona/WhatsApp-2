@@ -52,7 +52,7 @@ fun ContactLabel(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFF005c4b)),
+            .background(Color(0xFF202c33)),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column() {
@@ -66,7 +66,7 @@ fun ContactLabel(
                         .padding(start = 10.dp)
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(Color.DarkGray),
+                        .background(Color.LightGray),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(

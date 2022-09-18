@@ -31,6 +31,7 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ){
     val chats = viewModel.chats.observeAsState()
+    val loggedUser = viewModel.user
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -48,7 +49,7 @@ fun HomeScreen(
             Text(
                 modifier = Modifier.padding(15.dp),
                 textAlign = TextAlign.Center,
-                text = "WhatsApp2",
+                text = "WhatsApp2 - ${loggedUser.username}",
                 color = Color.White,
                 style = MaterialTheme.typography.h5.copy(
                     Color.White, fontWeight = FontWeight.Bold
@@ -103,7 +104,7 @@ fun ChatCard(
                         .padding(end = 4.dp)
                         .size(67.dp)
                         .clip(CircleShape)
-                        .background(Color.DarkGray),
+                        .background(Color.LightGray),
                     contentAlignment = Alignment.Center
                 ){
                     Text(

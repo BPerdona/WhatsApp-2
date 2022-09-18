@@ -9,6 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
@@ -21,9 +22,7 @@ import androidx.navigation.navArgument
 import br.com.whatsapp2.presentation.chat.ChatScreen
 import br.com.whatsapp2.presentation.chat.ChatVMFactory
 import br.com.whatsapp2.presentation.chat.ChatViewModel
-import br.com.whatsapp2.presentation.home.HomeScreen
-import br.com.whatsapp2.presentation.home.HomeVMFactory
-import br.com.whatsapp2.presentation.home.HomeViewModel
+import br.com.whatsapp2.presentation.home.*
 import br.com.whatsapp2.presentation.login.LoginScreen
 import br.com.whatsapp2.presentation.login.LoginVMFactory
 import br.com.whatsapp2.presentation.login.LoginViewModel
@@ -64,7 +63,14 @@ class MainActivity : ComponentActivity() {
             )
         }
 
-        homeViewModel.startConsume()
+        val consumeViewModel: ConsumeViewModel by viewModels{
+            ConsumeVMFactory(
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao(),
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageDao()
+            )
+        }
+
+        consumeViewModel.startConsume()
         setContent {
             WhatsApp2Theme {
                 // A surface container using the 'background' color from the theme
@@ -76,7 +82,8 @@ class MainActivity : ComponentActivity() {
                         loginViewModel,
                         homeViewModel,
                         newChatViewModel,
-                        chatViewModel
+                        chatViewModel,
+                        consumeViewModel
                     )
                 }
             }
@@ -90,9 +97,11 @@ fun WhatsApp2(
     loginViewModel: LoginViewModel,
     homeViewModel: HomeViewModel,
     newChatViewModel: NewChatViewModel,
-    chatViewModel: ChatViewModel
+    chatViewModel: ChatViewModel,
+    consumeViewModel: ConsumeViewModel
 ){
     val navController = rememberNavController()
+    val chats = consumeViewModel.chats.observeAsState()
     Scaffold() {
         NavHost(navController = navController, startDestination = "login"){
             composable(route = "login"){
@@ -109,6 +118,7 @@ fun WhatsApp2(
             }
             composable(route = "home"){
                 homeViewModel.user = loginViewModel.loggedUser
+                consumeViewModel.user = loginViewModel.loggedUser
                 homeViewModel.getChats(loginViewModel.loggedUser.pk)
                 HomeScreen(
                     navController,
@@ -116,7 +126,7 @@ fun WhatsApp2(
                 )
             }
             composable(route = "newchat"){
-                newChatViewModel.setUserConst(homeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
+                newChatViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
                 newChatViewModel.chatList = homeViewModel.chats.value?.map { it.Chat.contact } ?: listOf()
                 NewChatScreen(
                     navController,
