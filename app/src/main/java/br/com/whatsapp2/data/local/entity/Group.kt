@@ -7,22 +7,20 @@ import androidx.room.ForeignKey.RESTRICT
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "message",
+    tableName = "group",
     foreignKeys = [
         ForeignKey(
-            entity = Chat::class,
+            entity = User::class,
             parentColumns = arrayOf("pk"),
-            childColumns = arrayOf("chatPk"),
-            onDelete = RESTRICT,
-            onUpdate = CASCADE
+            childColumns = arrayOf("userPk"),
+            onUpdate = CASCADE,
+            onDelete = RESTRICT
         )
     ]
 )
-data class Message(
-    @PrimaryKey
-    val pk: String,
-    val text: String,
-    val sender: String,
-    val chatPk: Int = -1,
-    val groupPk: Int = -1
+data class Group(
+    @PrimaryKey(autoGenerate = true)
+    val pk: Int,
+    val groupName: String,
+    val userPk: Int
 )

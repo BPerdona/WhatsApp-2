@@ -31,6 +31,8 @@ import br.com.whatsapp2.presentation.newgroup.NewGroupScreen
 import br.com.whatsapp2.presentation.login.signup.SignUpScreen
 import br.com.whatsapp2.presentation.newchat.NewChatVMFactory
 import br.com.whatsapp2.presentation.newchat.NewChatViewModel
+import br.com.whatsapp2.presentation.newgroup.NewGroupVMFactory
+import br.com.whatsapp2.presentation.newgroup.NewGroupViewModel
 import br.com.whatsapp2.ui.theme.WhatsApp2Theme
 
 class MainActivity : ComponentActivity() {
@@ -46,7 +48,7 @@ class MainActivity : ComponentActivity() {
         val homeViewModel: HomeViewModel by viewModels{
             HomeVMFactory(
                 (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao(),
-                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageDao()
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.groupDao()
             )
         }
 
@@ -70,6 +72,12 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        val newGroupViewModel: NewGroupViewModel by viewModels{
+            NewGroupVMFactory(
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.groupDao()
+            )
+        }
+
         consumeViewModel.startConsume()
         setContent {
             WhatsApp2Theme {
@@ -83,7 +91,8 @@ class MainActivity : ComponentActivity() {
                         homeViewModel,
                         newChatViewModel,
                         chatViewModel,
-                        consumeViewModel
+                        consumeViewModel,
+                        newGroupViewModel
                     )
                 }
             }
@@ -98,7 +107,8 @@ fun WhatsApp2(
     homeViewModel: HomeViewModel,
     newChatViewModel: NewChatViewModel,
     chatViewModel: ChatViewModel,
-    consumeViewModel: ConsumeViewModel
+    consumeViewModel: ConsumeViewModel,
+    newGroupViewModel: NewGroupViewModel
 ){
     val navController = rememberNavController()
     val chats = consumeViewModel.chats.observeAsState()
@@ -133,17 +143,12 @@ fun WhatsApp2(
                     newChatViewModel
                 )
             }
-            composable(
-                route = "newgroup",
-                arguments = listOf(
-                    navArgument("name"){
-                        defaultValue=""
-                        type= NavType.StringType
-                    }
-                )
-            ){
+            composable(route = "newgroup"){
+                newGroupViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser)
+                newGroupViewModel.groupList = homeViewModel.groups.value?.map { it.group.groupName } ?: listOf()
                 NewGroupScreen(
-                    navController
+                    navController,
+                    newGroupViewModel
                 )
             }
             composable(

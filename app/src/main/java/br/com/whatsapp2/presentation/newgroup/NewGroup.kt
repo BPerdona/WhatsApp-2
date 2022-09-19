@@ -15,7 +15,8 @@ import androidx.navigation.NavController
 
 @Composable
 fun NewGroupScreen(
-    nav: NavController
+    nav: NavController,
+    viewModel: NewGroupViewModel
 ){
     var value by remember{ mutableStateOf("") }
     Column(
@@ -66,7 +67,8 @@ fun NewGroupScreen(
         Spacer(modifier = Modifier.size(30.dp))
         Button(
             onClick = {
-                nav.navigate("home") //TODO
+                viewModel.createEntryGroup(value)
+                nav.navigate("home")
             },
             colors = ButtonDefaults.buttonColors(
                 backgroundColor = Color(0xFF005c4b),
