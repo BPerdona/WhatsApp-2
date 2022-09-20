@@ -1,10 +1,9 @@
 package br.com.whatsapp2.presentation.newchat
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import br.com.whatsapp2.data.local.daos.ChatDao
 import br.com.whatsapp2.data.local.entity.Chat
+import br.com.whatsapp2.data.local.entity.ChatWithMessage
 import br.com.whatsapp2.util.RabbitUri
 import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +15,7 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
 
     var lastChatPk: Int = -1
     var userPk: Int = -1
-    var chatList: List<String> = listOf()
+    var chatList: LiveData<List<ChatWithMessage>> = dao.getUserChat(userPk).asLiveData()
 
     fun setUserConst(lastChatId: Int, userPk: Int){
         this.lastChatPk = lastChatId
@@ -24,8 +23,11 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
     }
 
     fun createChat(username: String){
-        if (chatList.contains(username))
-            return
+        chatList.value?.forEach {
+            if(it.Chat.contact == username){
+                return
+            }
+        }
         viewModelScope.launch{
             dao.saveChat(
                 Chat(

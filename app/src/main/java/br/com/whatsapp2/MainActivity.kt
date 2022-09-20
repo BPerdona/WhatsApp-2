@@ -22,6 +22,9 @@ import androidx.navigation.navArgument
 import br.com.whatsapp2.presentation.chat.ChatScreen
 import br.com.whatsapp2.presentation.chat.ChatVMFactory
 import br.com.whatsapp2.presentation.chat.ChatViewModel
+import br.com.whatsapp2.presentation.group.GroupScreen
+import br.com.whatsapp2.presentation.group.GroupVMFactory
+import br.com.whatsapp2.presentation.group.GroupViewModel
 import br.com.whatsapp2.presentation.home.*
 import br.com.whatsapp2.presentation.login.LoginScreen
 import br.com.whatsapp2.presentation.login.LoginVMFactory
@@ -65,10 +68,19 @@ class MainActivity : ComponentActivity() {
             )
         }
 
+        val groupViewModel: GroupViewModel by viewModels{
+            GroupVMFactory(
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.groupDao(),
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageGroupDao()
+            )
+        }
+
         val consumeViewModel: ConsumeViewModel by viewModels{
             ConsumeVMFactory(
                 (this.applicationContext as WhatsAppApplication).whatsAppDatabase.chatDao(),
-                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageDao()
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.groupDao(),
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageDao(),
+                (this.applicationContext as WhatsAppApplication).whatsAppDatabase.messageGroupDao()
             )
         }
 
@@ -92,7 +104,8 @@ class MainActivity : ComponentActivity() {
                         newChatViewModel,
                         chatViewModel,
                         consumeViewModel,
-                        newGroupViewModel
+                        newGroupViewModel,
+                        groupViewModel
                     )
                 }
             }
@@ -108,10 +121,12 @@ fun WhatsApp2(
     newChatViewModel: NewChatViewModel,
     chatViewModel: ChatViewModel,
     consumeViewModel: ConsumeViewModel,
-    newGroupViewModel: NewGroupViewModel
+    newGroupViewModel: NewGroupViewModel,
+    groupViewModel: GroupViewModel
 ){
     val navController = rememberNavController()
     val chats = consumeViewModel.chats.observeAsState()
+    val groups = consumeViewModel.groups.observeAsState()
     Scaffold() {
         NavHost(navController = navController, startDestination = "login"){
             composable(route = "login"){
@@ -137,7 +152,6 @@ fun WhatsApp2(
             }
             composable(route = "newchat"){
                 newChatViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
-                newChatViewModel.chatList = homeViewModel.chats.value?.map { it.Chat.contact } ?: listOf()
                 NewChatScreen(
                     navController,
                     newChatViewModel
@@ -145,7 +159,6 @@ fun WhatsApp2(
             }
             composable(route = "newgroup"){
                 newGroupViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser)
-                newGroupViewModel.groupList = homeViewModel.groups.value?.map { it.group.groupName } ?: listOf()
                 NewGroupScreen(
                     navController,
                     newGroupViewModel
@@ -162,10 +175,20 @@ fun WhatsApp2(
             ){
                 chatViewModel.userName = loginViewModel.loggedUser.username
                 chatViewModel.getChatMessages(it.arguments?.getInt("id")?:0)
-                ChatScreen(
-                    navController,
-                    chatViewModel
+                ChatScreen(chatViewModel)
+            }
+            composable(
+                route = "group/{id}",
+                arguments = listOf(
+                    navArgument("id"){
+                        defaultValue=0
+                        type= NavType.IntType
+                    }
                 )
+            ){
+                groupViewModel.userName = loginViewModel.loggedUser.username
+                groupViewModel.getGroupMessages(it.arguments?.getInt("id")?:0)
+                GroupScreen(groupViewModel)
             }
         }
     }

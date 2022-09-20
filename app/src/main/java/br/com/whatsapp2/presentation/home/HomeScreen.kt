@@ -18,11 +18,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import br.com.whatsapp2.data.local.entity.Chat
-import br.com.whatsapp2.data.local.entity.ChatWithMessage
-import br.com.whatsapp2.data.local.entity.Message
+import br.com.whatsapp2.data.local.entity.*
 import java.util.*
 
 @Composable
@@ -31,6 +30,7 @@ fun HomeScreen(
     viewModel: HomeViewModel
 ){
     val chats = viewModel.chats.observeAsState()
+    val groups = viewModel.groups.observeAsState()
     val loggedUser = viewModel.user
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,14 +57,15 @@ fun HomeScreen(
             )
         }
     Menu(nav)
-    HomeList(nav = nav, chats = chats.value ?: listOf())
+    HomeList(nav = nav, chats = chats.value?.asReversed() ?: listOf(), groups = groups.value?.asReversed() ?: listOf())
     }
 }
 
 @Composable
 fun HomeList(
     nav: NavController,
-    chats: List<ChatWithMessage>
+    chats: List<ChatWithMessage>,
+    groups: List<GroupWithMessage>
 ){
     LazyColumn(){
         items(chats){ chat ->
@@ -73,6 +74,86 @@ fun HomeList(
                 lastMessage = if (chat.messages.isEmpty()) "Inicie a conversa!" else chat.messages.last().text,
                 nav = nav
             )
+        }
+        items(groups){ group ->
+            GroupCard(
+                group = group.group,
+                lastMessage = if(group.messages.isEmpty()) "Inicia a conversa!" else group.messages.last().text,
+                nav = nav
+            )
+        }
+    }
+}
+
+@Composable
+fun GroupCard(
+    group: Group,
+    lastMessage: String,
+    nav: NavController
+){
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(6.dp)
+            .clickable {
+                nav.navigate("group/${group.pk}")
+            },
+        backgroundColor = Color(0xFF303c44),
+    ) {
+        Column() {
+            Row(
+                modifier = Modifier.padding(start = 6.dp),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .padding(end = 4.dp)
+                        .size(67.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray),
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = group.groupName[0].uppercase(),
+                        style = MaterialTheme.typography.h4
+                            .copy(color = Color.White, fontWeight = FontWeight.Normal)
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(
+                        modifier = Modifier.padding(bottom = 3.dp),
+                        text = group.groupName,
+                        style = MaterialTheme.typography.h5.copy(
+                            Color.White, fontWeight = FontWeight.Bold
+                        ),
+                    )
+                    Text(
+                        modifier = Modifier.padding(top = 3.dp),
+                        text = if(lastMessage.length>=35) lastMessage.substring(0,35)+"...." else lastMessage,
+                        style = MaterialTheme.typography.subtitle2.copy(
+                            Color.LightGray, fontWeight = FontWeight.Normal
+                        ),
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f).padding(end = 20.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.End,
+                ) {
+                    Text(
+                        text = "Grupo",
+                        style = MaterialTheme.typography.body1.copy(
+                            Color(0xFF005c4b), fontWeight = FontWeight.Bold
+                        ),
+                    )
+                }
+            }
         }
     }
 }
@@ -114,7 +195,7 @@ fun ChatCard(
                     )
                 }
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(2f),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start,
                 ) {
@@ -127,9 +208,21 @@ fun ChatCard(
                     )
                     Text(
                         modifier = Modifier.padding(top = 3.dp),
-                        text = if(lastMessage.length>=35) lastMessage.substring(0,35)+"...." else lastMessage,
+                        text = if(lastMessage.length>=25) lastMessage.substring(0,25)+"...." else lastMessage,
                         style = MaterialTheme.typography.subtitle2.copy(
                             Color.LightGray, fontWeight = FontWeight.Normal
+                        ),
+                    )
+                }
+                Column(
+                    modifier = Modifier.weight(1f).padding(end = 20.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.End,
+                ) {
+                    Text(
+                        text = "Contato",
+                        style = MaterialTheme.typography.body1.copy(
+                            Color(0xFF005c4b), fontWeight = FontWeight.Bold
                         ),
                     )
                 }
@@ -205,13 +298,4 @@ fun Menu(nav: NavController){
             )
         }
     }
-}
-
-
-private fun formatMessage(message: String): String{
-    var formatedMessage = ""
-    if(message.length>=35){
-        formatedMessage = message.substring(0,35)+"..."
-    }
-    return formatedMessage
 }

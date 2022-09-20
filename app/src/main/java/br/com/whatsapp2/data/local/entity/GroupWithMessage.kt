@@ -11,5 +11,5 @@ data class GroupWithMessage(
         parentColumn = "pk",
         entityColumn = "groupPk"
     )
-    val messages: List<Message>
+    val messages: List<MessageGroup>
 )

@@ -4,18 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import br.com.whatsapp2.data.local.daos.ChatDao
-import br.com.whatsapp2.data.local.daos.GroupDao
-import br.com.whatsapp2.data.local.daos.MessageDao
-import br.com.whatsapp2.data.local.daos.UserDao
-import br.com.whatsapp2.data.local.entity.Chat
-import br.com.whatsapp2.data.local.entity.Group
-import br.com.whatsapp2.data.local.entity.Message
-import br.com.whatsapp2.data.local.entity.User
+import br.com.whatsapp2.data.local.daos.*
+import br.com.whatsapp2.data.local.entity.*
 
 
 @Database(
-    entities = [Chat::class, User::class, Message::class, Group::class],
+    entities = [Chat::class, User::class, Message::class, Group::class, MessageGroup::class],
     version = 1,
     exportSchema = false
 )
@@ -25,6 +19,7 @@ abstract class WhatsAppDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun messageDao(): MessageDao
     abstract fun groupDao(): GroupDao
+    abstract fun messageGroupDao(): MessageGroupDao
 
     companion object {
 

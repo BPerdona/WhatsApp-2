@@ -1,9 +1,9 @@
-package br.com.whatsapp2.presentation.chat
+package br.com.whatsapp2.presentation.group
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -21,29 +21,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import br.com.whatsapp2.data.local.entity.Message
-
+import br.com.whatsapp2.data.local.entity.MessageGroup
 
 @Composable
-fun ChatScreen(
-    viewModel: ChatViewModel
-) {
+fun GroupScreen(
+    viewModel: GroupViewModel
+){
     Column(Modifier.fillMaxSize()) {
-        ContactLabel(viewModel)
-        MessageList(
+        GroupLabel(viewModel)
+        GroupMessageList(
             viewModel = viewModel,
-            Modifier
+            modifier = Modifier
                 .background(Color(0xFF111b21))
-                .weight(1f),
+                .weight(1f)
         )
-        MessageInput(viewModel)
+        GroupMessageInput(viewModel)
     }
+
 }
 
 @Composable
-fun ContactLabel(
-    viewModel: ChatViewModel
+fun GroupLabel(
+    viewModel: GroupViewModel
 ){
-    val chat = viewModel.chatWithMessage.observeAsState()
+    val groups = viewModel.groupWithMessage.observeAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -65,7 +66,7 @@ fun ContactLabel(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = chat.value?.Chat?.contact?.get(0)?.uppercase() ?: "?",
+                        text = groups.value?.group?.groupName?.get(0)?.uppercase() ?: "?",
                         style = MaterialTheme.typography.h4
                             .copy(color = Color.White, fontWeight = FontWeight.Normal)
                     )
@@ -76,7 +77,7 @@ fun ContactLabel(
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 15.dp),
-                        text = chat.value?.Chat?.contact?.uppercase()?:"",
+                        text = groups.value?.group?.groupName?.uppercase()?:"",
                         style = MaterialTheme.typography.h5
                             .copy(color = Color.White, fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center
@@ -89,11 +90,11 @@ fun ContactLabel(
 
 
 @Composable
-fun MessageList(
-    viewModel: ChatViewModel,
+fun GroupMessageList(
+    viewModel: GroupViewModel,
     modifier: Modifier
 ){
-    var chat = viewModel.chatWithMessage.observeAsState()
+    var groups = viewModel.groupWithMessage.observeAsState()
     Box(
         modifier=modifier,
         contentAlignment = Alignment.Center,
@@ -102,8 +103,8 @@ fun MessageList(
             modifier = Modifier.fillMaxSize(),
             reverseLayout = true,
         ) {
-            items(chat.value?.messages?.asReversed() ?: listOf()) {
-                MessageCard(msg = it, chat.value?.Chat?.contact ?: "")
+            items(groups.value?.messages?.asReversed() ?: listOf()){
+                MessageCard(msg = it, groups.value?.group?.groupName ?: "")
             }
         }
     }
@@ -112,7 +113,7 @@ fun MessageList(
 
 @Composable
 fun MessageCard(
-    msg: Message,
+    msg: MessageGroup,
     contact:String
 ){
     Column(
@@ -151,10 +152,10 @@ fun MessageCard(
 }
 
 @Composable
-fun MessageInput(
-    viewModel: ChatViewModel
+fun GroupMessageInput(
+    viewModel: GroupViewModel
 ){
-    var chat = viewModel.chatWithMessage.observeAsState()
+    var groups = viewModel.groupWithMessage.observeAsState()
     var message by remember{
         mutableStateOf("")
     }
@@ -179,7 +180,7 @@ fun MessageInput(
                 .height(56.dp)
                 .padding(start = 5.dp, end = 5.dp),
             onClick = {
-                viewModel.sendMessage(message, chat.value?.Chat?.contact ?: "Anon")
+                viewModel.sendMessage(message, groups.value?.group?.groupName ?: "Anon")
                 message = ""
             },
             enabled = message.isNotBlank(),

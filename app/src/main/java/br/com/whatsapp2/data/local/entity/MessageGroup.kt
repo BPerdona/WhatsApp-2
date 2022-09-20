@@ -2,27 +2,24 @@ package br.com.whatsapp2.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.ForeignKey.CASCADE
-import androidx.room.ForeignKey.RESTRICT
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "messageChat",
+    tableName = "messageGroup",
     foreignKeys = [
         ForeignKey(
-            entity = Chat::class,
+            entity = Group::class,
             parentColumns = arrayOf("pk"),
-            childColumns = arrayOf("chatPk"),
-            onDelete = RESTRICT,
-            onUpdate = CASCADE
+            childColumns = arrayOf("groupPk"),
+            onDelete = ForeignKey.RESTRICT,
+            onUpdate = ForeignKey.CASCADE
         )
     ]
 )
-data class Message(
+data class MessageGroup(
     @PrimaryKey
     val pk: String,
     val text: String,
     val sender: String,
-    val chatPk: Int = 0,
-    val groupPk: Int = 0
+    val groupPk: Int
 )

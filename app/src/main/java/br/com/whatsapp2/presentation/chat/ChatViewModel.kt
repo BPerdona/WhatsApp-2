@@ -53,7 +53,7 @@ class ChatViewModel(private val daoChat: ChatDao, private val daoMessage: Messag
             val connection = factory.newConnection()
             val channel = connection.createChannel()
             channel.queueDeclare(contact, false, false, false, null)
-            val message = "${userName},${messageChat}"
+            val message = "${userName}|?|${messageChat}"
             channel.basicPublish("", contact, null, message.toByteArray(Charset.forName("UTF-8")))
             Log.e("chat", "Mensagem enviada: $messageChat")
             channel.close()

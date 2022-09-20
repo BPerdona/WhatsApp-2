@@ -1,12 +1,12 @@
 package br.com.whatsapp2.presentation.newgroup
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import androidx.lifecycle.*
 import br.com.whatsapp2.data.local.daos.ChatDao
 import br.com.whatsapp2.data.local.daos.GroupDao
 import br.com.whatsapp2.data.local.entity.Chat
 import br.com.whatsapp2.data.local.entity.Group
+import br.com.whatsapp2.data.local.entity.GroupWithMessage
 import br.com.whatsapp2.data.local.entity.User
 import br.com.whatsapp2.util.RabbitUri
 import com.rabbitmq.client.BuiltinExchangeType
@@ -20,7 +20,7 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
 
     var lastGroupPk: Int = -1
     var user: User = User(-1,"", "")
-    var groupList: List<String> = listOf()
+    var groupList: LiveData<List<GroupWithMessage>> = dao.getUserGroups(user.pk).asLiveData()
 
     fun setUserConst(lastChatId: Int, user: User){
         this.lastGroupPk = lastChatId
@@ -28,8 +28,13 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
     }
 
     fun createEntryGroup(groupName: String){
-        if (groupList.contains(groupName))
-            return
+        Log.e("aa", "entrando group na lista: $groupList")
+        groupList.value?.forEach {
+            if(it.group.groupName==groupName){
+                return
+            }
+        }
+        Log.e("aa", "Continuou para salvar lista")
         viewModelScope.launch{
             dao.saveGroup(
                 Group(
