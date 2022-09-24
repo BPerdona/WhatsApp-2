@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import br.com.whatsapp2.data.local.daos.ChatDao
 import br.com.whatsapp2.data.local.entity.Chat
 import br.com.whatsapp2.data.local.entity.ChatWithMessage
+import br.com.whatsapp2.remote.RabbitApi
+import br.com.whatsapp2.remote.models.SourceQueue
 import br.com.whatsapp2.util.RabbitUri
 import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.Dispatchers
@@ -13,17 +15,49 @@ import java.lang.IllegalArgumentException
 
 class NewChatViewModel(val dao: ChatDao): ViewModel(){
 
-    var lastChatPk: Int = -1
-    var userPk: Int = -1
-    var chatList: LiveData<List<ChatWithMessage>> = dao.getUserChat(userPk).asLiveData()
+    init {
+        viewModelScope.launch {
+            _queueList = MutableLiveData(RabbitApi.retrofitService.getQueues())
+        }
+    }
+
+    var lastChatPk: Int = 0
+    var user: Int = 0
+    private var _chatList: LiveData<List<ChatWithMessage>> = MutableLiveData()
+    val chatList: LiveData<List<ChatWithMessage>>
+        get() = _chatList
+
+    private var _queueList: LiveData<List<SourceQueue>> = MutableLiveData()
+    val queueList: LiveData<List<SourceQueue>>
+        get(){
+            val names = _chatList.value?.map { it.Chat.contact } ?: listOf()
+            val queues = _queueList.value?.filter {
+                !names.contains(it.name)
+            }
+            return if(_filter.value == "") {
+                MutableLiveData(queues)
+            }
+            else{
+                MutableLiveData(queues?.filter { it.name.contains(_filter.value ?: "")})
+            }
+        }
+
+    private val _filter: MutableLiveData<String> = MutableLiveData("")
+    val filter: LiveData<String>
+        get() = _filter
+
+    fun updateFilter(word: String){
+        _filter.value = word
+    }
 
     fun setUserConst(lastChatId: Int, userPk: Int){
         this.lastChatPk = lastChatId
-        this.userPk = userPk
+        this.user = userPk
+        _chatList = dao.getUserChat(userPk).asLiveData()
     }
 
     fun createChat(username: String){
-        chatList.value?.forEach {
+        _chatList.value?.forEach {
             if(it.Chat.contact == username){
                 return
             }
@@ -33,7 +67,7 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
                 Chat(
                     pk = lastChatPk,
                     contact = username,
-                    userPk = userPk
+                    userPk = user
                 )
             )
         }

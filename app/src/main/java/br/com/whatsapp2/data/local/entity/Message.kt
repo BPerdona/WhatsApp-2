@@ -23,6 +23,5 @@ data class Message(
     val pk: String,
     val text: String,
     val sender: String,
-    val chatPk: Int = 0,
-    val groupPk: Int = 0
+    val chatPk: Int
 )

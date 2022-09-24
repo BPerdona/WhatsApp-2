@@ -128,7 +128,7 @@ fun GroupCard(
                 ) {
                     Text(
                         modifier = Modifier.padding(bottom = 3.dp),
-                        text = group.groupName,
+                        text = if(group.groupName.length>=11) group.groupName.substring(0,11)+"..." else group.groupName,
                         style = MaterialTheme.typography.h5.copy(
                             Color.White, fontWeight = FontWeight.Bold
                         ),

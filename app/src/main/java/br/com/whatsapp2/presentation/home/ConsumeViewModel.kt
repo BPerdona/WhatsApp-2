@@ -38,11 +38,11 @@ class ConsumeViewModel(
     }
 
     fun getChatLastIndex(): Int{
-        return if(_chats.value?.isEmpty() == true) 0 else _chats.value?.last()?.Chat?.pk?.plus(1) ?: 0
+        return if(_chats.value?.isEmpty() == true) 1 else _chats.value?.last()?.Chat?.pk?.plus(1) ?: 1
     }
 
-    fun getGroupLastIndex(): Int{
-        return if(_groups.value?.isEmpty() == true) 0 else _groups.value?.last()?.group?.pk?.plus(1) ?: 0
+    fun getLastGroupIndex(): Int{
+        return if(_groups.value?.isEmpty() == true) 1 else _groups.value?.last()?.group?.pk?.plus(1) ?: 1
     }
 
     fun startConsume(){
@@ -57,7 +57,6 @@ class ConsumeViewModel(
         while (user.pk == -1){
             delay(200L)
         }
-        Log.e("a", "Entrou no consume")
         withContext(Dispatchers.IO){
             while (true){
                 try {
@@ -67,10 +66,7 @@ class ConsumeViewModel(
                         channel.queueDeclare(user.username, false, false, false, null)
                         val deliverCallback = DeliverCallback{consumerTag: String?, delivery: Delivery ->
                             val message = String(delivery.body, StandardCharsets.UTF_8).split("|?|")
-                            when(message.size){
-                                3 -> {addMessageGroup(message[0], message[1], message[2])}
-                                else -> {addMessageChat(message[0], message[1])}
-                            }
+                                addMessageChat(message[0], message[1])
                             Log.e("a", "$consumerTag receive a message: $message")
                         }
 
@@ -96,45 +92,10 @@ class ConsumeViewModel(
         }
     }
 
-    private fun addMessageGroup(group: String, contact: String, text: String){
-        Log.e("error", "Entrou função de adicionar msg. contact: $contact, username: ${user.username}")
-        if(user.username == contact)
-            return
-        viewModelScope.launch {
-            var groupPk = -1
-            groups.value?.forEach {
-                if(it.group.groupName == group){
-                    groupPk=it.group.pk
-                }
-            }
-            Log.e("aa","Pegou o indice: $groupPk")
-            if(groupPk == -1){
-                var newIndex = getGroupLastIndex()
-                groupDao.saveGroup(
-                    Group(
-                        newIndex,
-                        group,
-                        user.pk
-                    )
-                )
-                groupPk=newIndex
-            }
-            delay(10L)
-            messageGroup.saveMessage(
-                MessageGroup(
-                    pk = UUID.randomUUID().toString(),
-                    sender = contact,
-                    groupPk = groupPk,
-                    text = text
-                )
-            )
-        }
-    }
-
     private fun addMessageChat(contact: String, text:String){
         viewModelScope.launch {
             var chatPk = -1
-            chats.value?.forEach {
+            chats.value?.filter{ it.Chat.userPk == user.pk }?.forEach {
                 if(it.Chat.contact == contact){
                     chatPk=it.Chat.pk
                 }

@@ -2,40 +2,69 @@ package br.com.whatsapp2.presentation.newgroup
 
 import android.util.Log
 import androidx.lifecycle.*
-import br.com.whatsapp2.data.local.daos.ChatDao
 import br.com.whatsapp2.data.local.daos.GroupDao
-import br.com.whatsapp2.data.local.entity.Chat
-import br.com.whatsapp2.data.local.entity.Group
-import br.com.whatsapp2.data.local.entity.GroupWithMessage
-import br.com.whatsapp2.data.local.entity.User
+import br.com.whatsapp2.data.local.entity.*
+import br.com.whatsapp2.remote.RabbitApi
+import br.com.whatsapp2.remote.models.SourceExchenge
 import br.com.whatsapp2.util.RabbitUri
 import com.rabbitmq.client.BuiltinExchangeType
 import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
 
 class NewGroupViewModel(val dao: GroupDao): ViewModel(){
 
-    var lastGroupPk: Int = -1
-    var user: User = User(-1,"", "")
-    var groupList: LiveData<List<GroupWithMessage>> = dao.getUserGroups(user.pk).asLiveData()
-
-    fun setUserConst(lastChatId: Int, user: User){
-        this.lastGroupPk = lastChatId
-        this.user = user
+    init {
+        viewModelScope.launch {
+            _exchangeList = MutableLiveData(RabbitApi.retrofitService.getExchengs())
+        }
     }
 
-    fun createEntryGroup(groupName: String){
-        Log.e("aa", "entrando group na lista: $groupList")
+    var lastGroupPk: Int = -1
+    var user: User = User(-1,"", "")
+
+    private var _groupList: LiveData<List<String>> = MutableLiveData()
+    val groupList: LiveData<List<String>>
+        get() = _groupList
+
+    private var _exchangeList: LiveData<List<SourceExchenge>> = MutableLiveData()
+    val exchangeList: LiveData<List<SourceExchenge>>
+        get() {
+            val names = _groupList.value ?: listOf()
+            val exchanges = _exchangeList.value?.filter { !names.contains(it.name) }
+            return if(_filter.value == ""){
+                MutableLiveData(exchanges)
+            }
+            else{
+                MutableLiveData(exchanges?.filter { it.name.contains(_filter.value?:"") })
+            }
+        }
+
+    private var _filter: MutableLiveData<String> = MutableLiveData("")
+    val filter: LiveData<String>
+        get() = _filter
+
+    fun updateFilter(word:String){
+        _filter.value = word
+    }
+
+    fun setUserConst(groupId: Int, user: User){
+        this.lastGroupPk = groupId
+        this.user = user
+        _groupList = dao.getAllGroupsNames(user.pk).asLiveData()
+    }
+
+    fun createGroup(groupName: String){
         groupList.value?.forEach {
-            if(it.group.groupName==groupName){
+            if(it==groupName){
                 return
             }
         }
-        Log.e("aa", "Continuou para salvar lista")
-        viewModelScope.launch{
+        viewModelScope.launch {
             dao.saveGroup(
                 Group(
                     pk = lastGroupPk,
@@ -45,21 +74,32 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
             )
         }
         viewModelScope.launch {
-            bindQueue(groupName)
+            withContext(Dispatchers.IO){
+                val factory = ConnectionFactory()
+                factory.setUri(RabbitUri)
+                val connection = factory.newConnection()
+                val channel = connection.createChannel()
+                channel.exchangeDeclare(groupName, BuiltinExchangeType.FANOUT, true)
+                channel.close()
+                connection.close()
+            }
         }
     }
 
-
-    private suspend fun bindQueue(groupName: String){
-        withContext(Dispatchers.IO){
-            val factory = ConnectionFactory()
-            factory.setUri(RabbitUri)
-            val connection = factory.newConnection()
-            val channel = connection.createChannel()
-            channel.exchangeDeclare(groupName, BuiltinExchangeType.FANOUT, true)
-            channel.queueBind(user.username, groupName, "")
-            channel.close()
-            connection.close()
+    fun entryGroup(groupName: String){
+        groupList.value?.forEach {
+            if(it==groupName){
+                return
+            }
+        }
+        viewModelScope.launch{
+            dao.saveGroup(
+                Group(
+                    pk = lastGroupPk,
+                    groupName = groupName,
+                    userPk = user.pk
+                )
+            )
         }
     }
 }

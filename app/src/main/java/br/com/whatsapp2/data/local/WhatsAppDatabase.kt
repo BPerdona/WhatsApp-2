@@ -10,7 +10,7 @@ import br.com.whatsapp2.data.local.entity.*
 
 @Database(
     entities = [Chat::class, User::class, Message::class, Group::class, MessageGroup::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class WhatsAppDatabase: RoomDatabase() {

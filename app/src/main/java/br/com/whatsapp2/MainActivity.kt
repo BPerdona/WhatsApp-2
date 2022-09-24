@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -127,7 +129,9 @@ fun WhatsApp2(
     val navController = rememberNavController()
     val chats = consumeViewModel.chats.observeAsState()
     val groups = consumeViewModel.groups.observeAsState()
-    Scaffold() {
+    Scaffold(
+        modifier = Modifier.fillMaxSize().background(Color(0xFF111b21)),
+    ) {
         NavHost(navController = navController, startDestination = "login"){
             composable(route = "login"){
                 LoginScreen(
@@ -145,20 +149,20 @@ fun WhatsApp2(
                 homeViewModel.user = loginViewModel.loggedUser
                 consumeViewModel.user = loginViewModel.loggedUser
                 homeViewModel.getChats(loginViewModel.loggedUser.pk)
+                newChatViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
+                newGroupViewModel.setUserConst(consumeViewModel.getLastGroupIndex(), loginViewModel.loggedUser)
                 HomeScreen(
                     navController,
                     homeViewModel
                 )
             }
             composable(route = "newchat"){
-                newChatViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
                 NewChatScreen(
                     navController,
                     newChatViewModel
                 )
             }
             composable(route = "newgroup"){
-                newGroupViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser)
                 NewGroupScreen(
                     navController,
                     newGroupViewModel

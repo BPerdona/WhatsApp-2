@@ -23,4 +23,6 @@ interface GroupDao {
     @Query("SELECT * FROM `group`")
     fun getAllGroups(): Flow<List<GroupWithMessage>>
 
+    @Query("SELECT groupName FROM `group` where userPk=:userPk")
+    fun getAllGroupsNames(userPk: Int): Flow<List<String>>
 }
