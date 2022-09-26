@@ -32,7 +32,6 @@ class GroupViewModel(private val daoGroup: GroupDao, private val daoMessage: Mes
 
     fun sendMessage(message: String, group: String){
         viewModelScope.launch {
-            Log.e("error", "salvando msg:\nPk: UUID\ntext: $message\nsender: $userName\ngroupPk: ${groupWithMessage.value?.group?.pk ?: -1}")
             daoMessage.saveMessage(
                 MessageGroup(
                     pk = UUID.randomUUID().toString(),
@@ -53,8 +52,8 @@ class GroupViewModel(private val daoGroup: GroupDao, private val daoMessage: Mes
             factory.setUri(RabbitUri)
             val connection = factory.newConnection()
             val channel = connection.createChannel()
-            val message = "$group|?|$userName|?|$messageChat"
-            channel.basicPublish( group, "", null, message.toByteArray(Charset.forName("UTF-8")))
+            val message = "$userName|?|$messageChat"
+            channel.basicPublish(group, "", null, message.toByteArray(Charset.forName("UTF-8")))
             channel.close()
             connection.close()
         }

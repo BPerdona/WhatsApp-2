@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import br.com.whatsapp2.data.local.entity.Message
 import br.com.whatsapp2.data.local.entity.MessageGroup
 
@@ -77,7 +78,7 @@ fun GroupLabel(
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 15.dp),
-                        text = groups.value?.group?.groupName?.uppercase()?:"",
+                        text = groups.value?.group?.groupName?:"",
                         style = MaterialTheme.typography.h5
                             .copy(color = Color.White, fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center
@@ -95,6 +96,7 @@ fun GroupMessageList(
     modifier: Modifier
 ){
     var groups = viewModel.groupWithMessage.observeAsState()
+    val user = viewModel.userName
     Box(
         modifier=modifier,
         contentAlignment = Alignment.Center,
@@ -104,7 +106,7 @@ fun GroupMessageList(
             reverseLayout = true,
         ) {
             items(groups.value?.messages?.asReversed() ?: listOf()){
-                MessageCard(msg = it, groups.value?.group?.groupName ?: "")
+                MessageCard(msg = it,  user)
             }
         }
     }
@@ -114,30 +116,30 @@ fun GroupMessageList(
 @Composable
 fun MessageCard(
     msg: MessageGroup,
-    contact:String
+    user: String
 ){
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalAlignment = when (msg.sender) {
-            contact -> {
-                Alignment.Start
+            user -> {
+                Alignment.End
             }
             else -> {
-                Alignment.End
+                Alignment.Start
             }
         },
     ) {
         Card(
             modifier = Modifier.widthIn(max = 340.dp),
-            shape = cardShapeForm(msg.sender!=contact),
+            shape = cardShapeForm(msg.sender==user),
             backgroundColor = when(msg.sender){
-                contact -> {
-                    Color(0xFF202c33)
+                user -> {
+                    Color(0xFF005c4b)
                 }
                 else -> {
-                    Color(0xFF005c4b)
+                    Color(0xFF202c33)
 
                 }
             }
@@ -148,6 +150,11 @@ fun MessageCard(
                 color = Color.White
             )
         }
+        if(msg.sender != user)
+            Text(
+                text = msg.sender,
+                fontSize = 14.sp
+            )
     }
 }
 

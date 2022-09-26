@@ -76,7 +76,7 @@ fun ContactLabel(
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 15.dp),
-                        text = chat.value?.Chat?.contact?.uppercase()?:"",
+                        text = chat.value?.Chat?.contact?:"",
                         style = MaterialTheme.typography.h5
                             .copy(color = Color.White, fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center

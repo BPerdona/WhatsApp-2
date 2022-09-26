@@ -51,6 +51,46 @@ class ConsumeViewModel(
         viewModelScope.launch{
             consumeMessages(factory)
         }
+        viewModelScope.launch {
+            while (user.pk == -1){
+                delay(200L)
+            }
+            groups.value?.filter { it.group.userPk == user.pk }?.forEach {
+                consumeGroupMessages(factory, it.group.groupName)
+            }
+        }
+    }
+
+    private suspend fun consumeGroupMessages(factory: ConnectionFactory, exchange: String){
+        withContext(Dispatchers.IO){
+            try {
+                val connection = factory.newConnection()
+                val channel = connection.createChannel()
+                try{
+                    channel.exchangeDeclare(exchange, BuiltinExchangeType.FANOUT, true)
+                    val queueName = channel.queueDeclare().queue
+                    channel.queueBind(queueName, exchange,"")
+
+                    val deliverCallback = DeliverCallback{consumerTag: String?, delivery: Delivery ->
+                        val message = String(delivery.body, StandardCharsets.UTF_8).split("|?|")
+                        addMessageGroup(exchange, message[0], message[1])
+                        Log.e("group", "receive a message: $message")
+                    }
+
+                    val cancelCallback = CancelCallback { consumerTag: String? ->
+                        Log.e("group", "$consumerTag was cancelled")
+                    }
+                    channel.basicConsume(queueName, true, deliverCallback, cancelCallback)
+                    Log.e("group", "Iniciou basic consume: $exchange")
+                }catch (e: Exception){
+                    Log.e("group", "Erro ao consumir mensagens: ${e.message}")
+                    channel.close()
+                    connection.close()
+                }
+            }catch (e: Exception){
+                Log.e("group", "Erro ao conectar mensagens: ${e.message}")
+            }
+        }
     }
 
     private suspend fun consumeMessages(factory: ConnectionFactory){
@@ -67,28 +107,58 @@ class ConsumeViewModel(
                         val deliverCallback = DeliverCallback{consumerTag: String?, delivery: Delivery ->
                             val message = String(delivery.body, StandardCharsets.UTF_8).split("|?|")
                                 addMessageChat(message[0], message[1])
-                            Log.e("a", "$consumerTag receive a message: $message")
+                            Log.e("chat", "$consumerTag receive a message: $message")
                         }
 
                         val cancelCallback = CancelCallback { consumerTag: String? ->
-                            Log.e("a", "$consumerTag was cancelled")
+                            Log.e("chat", "$consumerTag was cancelled")
                         }
                         channel.basicConsume(user.username, true, deliverCallback, cancelCallback)
-                        Log.e("a", "Iniciou basic consume")
+                        Log.e("chat", "Iniciou basic consume")
                         delay(5000L)
                         channel.close()
                         connection.close()
-                        Log.e("a", "Fechou as conexões")
+                        Log.e("chat", "Fechou as conexões")
                     }catch (e: Exception){
-                        Log.e("Error", "Erro ao consumir mensagens: ${e.message}")
+                        Log.e("chat", "Erro ao consumir mensagens: ${e.message}")
                         channel.close()
                         connection.close()
                     }
                 }catch (e: Exception){
-                    Log.e("Error", "Erro ao conectar mensagens: ${e.message}")
+                    Log.e("chat", "Erro ao conectar mensagens: ${e.message}")
                 }
                 delay(100L)
             }
+        }
+    }
+
+    private fun addMessageGroup(group: String, contact: String, text: String){
+        Log.e("aa","Armazenando mensagem")
+        viewModelScope.launch {
+            if(contact == user.username){
+                Log.e("aa","Recebeu mensagem de si mesmo")
+                return@launch
+            }
+
+            var groupPk = -1
+            groups.value?.filter { it.group.userPk == user.pk }?.forEach {
+                if(it.group.groupName == group){
+                    groupPk=it.group.pk
+                }
+            }
+            if(groupPk==-1){
+                Log.e("a", "Pegou o indice -1 e saiu do armazenamento")
+                return@launch
+            }
+            messageGroup.saveMessage(
+                MessageGroup(
+                    pk = UUID.randomUUID().toString(),
+                    text = text,
+                    sender = contact,
+                    groupPk = groupPk
+                )
+            )
+            Log.e("a","Save message: \npk:UUID\ntext:$text\nsender:$contact\ngroup:$groupPk")
         }
     }
 
