@@ -165,7 +165,8 @@ fun WhatsApp2(
             composable(route = "newgroup"){
                 NewGroupScreen(
                     navController,
-                    newGroupViewModel
+                    newGroupViewModel,
+                    consumeViewModel::newGroupConsume
                 )
             }
             composable(

@@ -19,15 +19,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import br.com.whatsapp2.presentation.home.ConsumeViewModel
 
 @Composable
 fun NewGroupScreen(
     nav: NavController,
-    viewModel: NewGroupViewModel
+    viewModel: NewGroupViewModel,
+    consume: (String) -> Unit
 ){
     val search by viewModel.filter.observeAsState()
     val exchenges by viewModel.exchangeList.observeAsState()
-    val chats by viewModel.groupList.observeAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -57,7 +58,12 @@ fun NewGroupScreen(
         Spacer(modifier = Modifier.size(4.dp))
         LazyColumn(){
             items(exchenges?: listOf()){
-                GroupCard(group = it.name, nav = nav, addChat = viewModel::entryGroup)
+                GroupCard(
+                    group = it.name,
+                    nav = nav,
+                    addChat = viewModel::entryGroup,
+                    consume = consume
+                )
             }
         }
         newGroup(nav, viewModel, search?:"|")
@@ -90,7 +96,12 @@ fun SearchFilter(
 }
 
 @Composable
-fun GroupCard(group: String, nav: NavController, addChat :(String)->Unit){
+fun GroupCard(
+    group: String,
+    nav: NavController,
+    addChat :(String)->Unit,
+    consume: (String)->Unit
+){
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -98,6 +109,7 @@ fun GroupCard(group: String, nav: NavController, addChat :(String)->Unit){
             .size(60.dp)
             .clickable {
                 addChat(group)
+                consume(group)
                 nav.navigate("home")
             },
         backgroundColor = Color(0xFF303c44)

@@ -45,6 +45,14 @@ class ConsumeViewModel(
         return if(_groups.value?.isEmpty() == true) 1 else _groups.value?.last()?.group?.pk?.plus(1) ?: 1
     }
 
+    fun newGroupConsume(exchange: String){
+        val factory = ConnectionFactory()
+        factory.setUri(RabbitUri)
+        viewModelScope.launch {
+            consumeGroupMessages(factory, exchange)
+        }
+    }
+
     fun startConsume(){
         val factory = ConnectionFactory()
         factory.setUri(RabbitUri)
