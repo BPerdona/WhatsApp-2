@@ -1,9 +1,11 @@
 package br.com.whatsapp2.presentation.newchat
 
+import android.util.Log
 import androidx.lifecycle.*
 import br.com.whatsapp2.data.local.daos.ChatDao
 import br.com.whatsapp2.data.local.entity.Chat
 import br.com.whatsapp2.data.local.entity.ChatWithMessage
+import br.com.whatsapp2.data.local.entity.User
 import br.com.whatsapp2.remote.RabbitApi
 import br.com.whatsapp2.remote.models.SourceQueue
 import br.com.whatsapp2.util.RabbitUri
@@ -22,7 +24,7 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
     }
 
     var lastChatPk: Int = 0
-    var user: Int = 0
+    var user = User(0,"","")
     private var _chatList: LiveData<List<ChatWithMessage>> = MutableLiveData()
     val chatList: LiveData<List<ChatWithMessage>>
         get() = _chatList
@@ -31,8 +33,9 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
     val queueList: LiveData<List<SourceQueue>>
         get(){
             val names = _chatList.value?.map { it.Chat.contact } ?: listOf()
+            Log.e("", names.toString())
             val queues = _queueList.value?.filter {
-                !names.contains(it.name)
+                !names.contains(it.name)&&it.name!=user.username
             }
             return if(_filter.value == "") {
                 MutableLiveData(queues)
@@ -50,10 +53,10 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
         _filter.value = word
     }
 
-    fun setUserConst(lastChatId: Int, userPk: Int){
+    fun setUserConst(lastChatId: Int, user: User){
         this.lastChatPk = lastChatId
-        this.user = userPk
-        _chatList = dao.getUserChat(userPk).asLiveData()
+        this.user = user
+        _chatList = dao.getUserChat(user.pk).asLiveData()
     }
 
     fun createChat(username: String){
@@ -67,7 +70,7 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
                 Chat(
                     pk = lastChatPk,
                     contact = username,
-                    userPk = user
+                    userPk = user.pk
                 )
             )
         }

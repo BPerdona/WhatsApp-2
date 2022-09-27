@@ -21,7 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.whatsapp2.data.local.entity.Message
 import br.com.whatsapp2.data.local.entity.MessageGroup
 
 @Composable
@@ -45,7 +44,7 @@ fun GroupScreen(
 fun GroupLabel(
     viewModel: GroupViewModel
 ){
-    val groups = viewModel.groupWithMessage.observeAsState()
+    val group = viewModel.groupWithMessage.observeAsState()
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,7 +66,7 @@ fun GroupLabel(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = groups.value?.group?.groupName?.get(0)?.uppercase() ?: "?",
+                        text = group.value?.group?.groupName?.get(1)?.uppercase() ?: "?",
                         style = MaterialTheme.typography.h4
                             .copy(color = Color.White, fontWeight = FontWeight.Normal)
                     )
@@ -78,7 +77,7 @@ fun GroupLabel(
                 ) {
                     Text(
                         modifier = Modifier.padding(start = 15.dp),
-                        text = groups.value?.group?.groupName?:"",
+                        text = group.value?.group?.groupName?.substring(1)?:"",
                         style = MaterialTheme.typography.h5
                             .copy(color = Color.White, fontWeight = FontWeight.Bold),
                         textAlign = TextAlign.Center

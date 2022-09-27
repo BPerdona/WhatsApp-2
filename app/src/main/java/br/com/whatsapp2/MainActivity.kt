@@ -149,7 +149,7 @@ fun WhatsApp2(
                 homeViewModel.user = loginViewModel.loggedUser
                 consumeViewModel.user = loginViewModel.loggedUser
                 homeViewModel.getChats(loginViewModel.loggedUser.pk)
-                newChatViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser.pk)
+                newChatViewModel.setUserConst(consumeViewModel.getChatLastIndex(), loginViewModel.loggedUser)
                 newGroupViewModel.setUserConst(consumeViewModel.getLastGroupIndex(), loginViewModel.loggedUser)
                 HomeScreen(
                     navController,

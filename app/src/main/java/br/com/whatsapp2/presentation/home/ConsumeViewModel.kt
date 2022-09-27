@@ -97,6 +97,7 @@ class ConsumeViewModel(
                 }
             }catch (e: Exception){
                 Log.e("group", "Erro ao conectar mensagens: ${e.message}")
+                delay(500L)
             }
         }
     }
@@ -134,6 +135,7 @@ class ConsumeViewModel(
                     }
                 }catch (e: Exception){
                     Log.e("chat", "Erro ao conectar mensagens: ${e.message}")
+                    delay(500L)
                 }
                 delay(100L)
             }
@@ -141,10 +143,9 @@ class ConsumeViewModel(
     }
 
     private fun addMessageGroup(group: String, contact: String, text: String){
-        Log.e("aa","Armazenando mensagem")
+        Log.e("Group","Armazenando mensagem")
         viewModelScope.launch {
             if(contact == user.username){
-                Log.e("aa","Recebeu mensagem de si mesmo")
                 return@launch
             }
 
@@ -166,7 +167,6 @@ class ConsumeViewModel(
                     groupPk = groupPk
                 )
             )
-            Log.e("a","Save message: \npk:UUID\ntext:$text\nsender:$contact\ngroup:$groupPk")
         }
     }
 

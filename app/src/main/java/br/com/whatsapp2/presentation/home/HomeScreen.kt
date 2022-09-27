@@ -116,7 +116,7 @@ fun GroupCard(
                     contentAlignment = Alignment.Center
                 ){
                     Text(
-                        text = group.groupName[0].uppercase(),
+                        text = group.groupName[1].uppercase(),
                         style = MaterialTheme.typography.h4
                             .copy(color = Color.White, fontWeight = FontWeight.Normal)
                     )
@@ -128,7 +128,7 @@ fun GroupCard(
                 ) {
                     Text(
                         modifier = Modifier.padding(bottom = 3.dp),
-                        text = if(group.groupName.length>=11) group.groupName.substring(0,11)+"..." else group.groupName,
+                        text = if(group.groupName.length>=11) group.groupName.substring(1,11)+"..." else group.groupName.substring(1),
                         style = MaterialTheme.typography.h5.copy(
                             Color.White, fontWeight = FontWeight.Bold
                         ),

@@ -11,6 +11,7 @@ import br.com.whatsapp2.data.local.entity.MessageGroup
 import br.com.whatsapp2.util.RabbitUri
 import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.lang.IllegalArgumentException
@@ -48,14 +49,21 @@ class GroupViewModel(private val daoGroup: GroupDao, private val daoMessage: Mes
 
     private suspend fun sendMessageRMQ(messageChat: String, group: String){
         withContext(Dispatchers.IO){
-            val factory = ConnectionFactory()
-            factory.setUri(RabbitUri)
-            val connection = factory.newConnection()
-            val channel = connection.createChannel()
-            val message = "$userName|?|$messageChat"
-            channel.basicPublish(group, "", null, message.toByteArray(Charset.forName("UTF-8")))
-            channel.close()
-            connection.close()
+            try{
+                val factory = ConnectionFactory()
+                factory.setUri(RabbitUri)
+                val connection = factory.newConnection()
+                val channel = connection.createChannel()
+                val message = "$userName|?|$messageChat"
+                channel.basicPublish(group, "", null, message.toByteArray(Charset.forName("UTF-8")))
+                channel.close()
+                connection.close()
+                Log.e("grupo", "Mensagem enviada: $messageChat")
+            }catch (e: Exception){
+                Log.e("grupo", "Erro ao enviar mensagem: $messageChat")
+                delay(500L)
+                sendMessageRMQ(messageChat, group)
+            }
         }
     }
 }

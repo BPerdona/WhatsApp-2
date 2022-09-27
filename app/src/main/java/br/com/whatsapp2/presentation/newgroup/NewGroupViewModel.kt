@@ -34,8 +34,15 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
     private var _exchangeList: LiveData<List<SourceExchenge>> = MutableLiveData()
     val exchangeList: LiveData<List<SourceExchenge>>
         get() {
+            if(_exchangeList.value?.isEmpty()==true)
+                return MutableLiveData()
             val names = _groupList.value ?: listOf()
-            val exchanges = _exchangeList.value?.filter { !names.contains(it.name) }
+            Log.e("", names.toString())
+            var exchanges = _exchangeList.value
+                ?.filter { it.name.isNotEmpty() }
+                ?.filter { it.name[0]=='*' }
+                ?.filter { !names.contains(it.name) }
+
             return if(_filter.value == ""){
                 MutableLiveData(exchanges)
             }
@@ -68,7 +75,7 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
             dao.saveGroup(
                 Group(
                     pk = lastGroupPk,
-                    groupName = groupName,
+                    groupName = "*$groupName",
                     userPk = user.pk
                 )
             )
@@ -79,7 +86,7 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
                 factory.setUri(RabbitUri)
                 val connection = factory.newConnection()
                 val channel = connection.createChannel()
-                channel.exchangeDeclare(groupName, BuiltinExchangeType.FANOUT, true)
+                channel.exchangeDeclare("*$groupName", BuiltinExchangeType.FANOUT, true)
                 channel.close()
                 connection.close()
             }

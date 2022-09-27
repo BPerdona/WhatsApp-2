@@ -29,6 +29,7 @@ fun NewGroupScreen(
 ){
     val search by viewModel.filter.observeAsState()
     val exchenges by viewModel.exchangeList.observeAsState()
+    val group by viewModel.groupList.observeAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -66,7 +67,8 @@ fun NewGroupScreen(
                 )
             }
         }
-        newGroup(nav, viewModel, search?:"|")
+        if(exchenges?.isEmpty() == true)
+            newGroup(nav, viewModel, search?:"|")
     }
 }
 
@@ -121,7 +123,7 @@ fun GroupCard(
         ){
             Text(
                 modifier = Modifier.weight(1f),
-                text = group,
+                text = group.substring(1),
                 style = MaterialTheme.typography.h6.copy(
                     Color.White, fontWeight = FontWeight.Bold
                 ),

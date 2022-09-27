@@ -48,16 +48,22 @@ class ChatViewModel(private val daoChat: ChatDao, private val daoMessage: Messag
 
     private suspend fun sendMessageRMQ(messageChat: String, contact: String){
         withContext(Dispatchers.IO){
-            val factory = ConnectionFactory()
-            factory.setUri(RabbitUri)
-            val connection = factory.newConnection()
-            val channel = connection.createChannel()
-            channel.queueDeclare(contact, false, false, false, null)
-            val message = "${userName}|?|${messageChat}"
-            channel.basicPublish("", contact, null, message.toByteArray(Charset.forName("UTF-8")))
-            Log.e("chat", "Mensagem enviada: $messageChat")
-            channel.close()
-            connection.close()
+            try{
+                val factory = ConnectionFactory()
+                factory.setUri(RabbitUri)
+                val connection = factory.newConnection()
+                val channel = connection.createChannel()
+                channel.queueDeclare(contact, false, false, false, null)
+                val message = "${userName}|?|${messageChat}"
+                channel.basicPublish("", contact, null, message.toByteArray(Charset.forName("UTF-8")))
+                Log.e("chat", "Mensagem enviada: $messageChat")
+                channel.close()
+                connection.close()
+            }catch (e: Exception){
+                delay(500L)
+                Log.e("chat", "Erro ao enviar msg: $messageChat")
+                sendMessageRMQ(messageChat, contact)
+            }
         }
     }
 }
