@@ -32,6 +32,9 @@ class NewChatViewModel(val dao: ChatDao): ViewModel(){
     private var _queueList: LiveData<List<SourceQueue>> = MutableLiveData()
     val queueList: LiveData<List<SourceQueue>>
         get(){
+            viewModelScope.launch {
+                _queueList = MutableLiveData(RabbitApi.retrofitService.getQueues())
+            }
             val names = _chatList.value?.map { it.Chat.contact } ?: listOf()
             Log.e("", names.toString())
             val queues = _queueList.value?.filter {

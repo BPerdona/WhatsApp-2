@@ -34,6 +34,9 @@ class NewGroupViewModel(val dao: GroupDao): ViewModel(){
     private var _exchangeList: LiveData<List<SourceExchenge>> = MutableLiveData()
     val exchangeList: LiveData<List<SourceExchenge>>
         get() {
+            viewModelScope.launch {
+                _exchangeList = MutableLiveData(RabbitApi.retrofitService.getExchengs())
+            }
             if(_exchangeList.value?.isEmpty()==true)
                 return MutableLiveData()
             val names = _groupList.value ?: listOf()
